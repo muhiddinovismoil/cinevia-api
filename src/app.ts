@@ -10,7 +10,6 @@ import { PrismaModule } from 'prisma';
       isGlobal: true,
     }),
     PrismaModule,
-    //
   ],
 })
 export class AppModule {}

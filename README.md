@@ -1,7 +1,7 @@
 # 🎬 Movie App Backend
 
 <div align="center">
-  <img src="./movie-logo.png" alt="Movie App Logo" width="150" height="150" />
+  <img src="./movieapp-logo.png" alt="Movie App Logo" width="150" height="150" />
   
   <h3>🎭 Professional Movie Management API</h3>
   <p>A modern, scalable backend solution for movie enthusiasts and content creators</p>

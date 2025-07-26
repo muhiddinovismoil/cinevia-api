@@ -1,98 +1,183 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+# 🎬 Movie App Backend
+
+<div align="center">
+  <img src="./movie-logo.png" alt="Movie App Logo" width="150" height="150" />
+  
+  <h3>🎭 Professional Movie Management API</h3>
+  <p>A modern, scalable backend solution for movie enthusiasts and content creators</p>
+  
+  <p>
+    <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue.svg" />
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-green.svg" />
+    <img alt="Node.js" src="https://img.shields.io/badge/node.js-18+-brightgreen.svg" />
+    <img alt="NestJS" src="https://img.shields.io/badge/nestjs-10+-red.svg" />
+    <img alt="PostgreSQL" src="https://img.shields.io/badge/postgresql-15+-blue.svg" />
+  </p>
+</div>
+
+---
+
+## ✨ About The Project
+
+**Movie App Backend** is a cutting-edge RESTful API built with modern technologies to power comprehensive movie management applications. Whether you're building a movie review platform, content management system, or entertainment app, this backend provides all the essential features you need.
+
+### 🚀 Why Choose This API?
+
+- **🏗️ Modern Architecture**: Built with NestJS for scalability and maintainability
+- **🔒 Enterprise Security**: JWT authentication with role-based access control
+- **📊 Type-Safe Database**: Prisma ORM with PostgreSQL for reliable data operations
+- **📖 Auto Documentation**: Swagger/OpenAPI integration for seamless API exploration
+- **⚡ High Performance**: Optimized queries and efficient caching strategies
+
+## 🎯 Key Features
+
+| Feature                  | Description                                          |
+| ------------------------ | ---------------------------------------------------- |
+| 🎬 **Movie Management**  | Complete CRUD operations with rich metadata          |
+| 👥 **User System**       | Registration, authentication, and profile management |
+| ⭐ **Reviews & Ratings** | User-generated content with advanced rating system   |
+| 🔍 **Smart Search**      | Powerful search with filters and sorting options     |
+| ❤️ **Favorites**         | Personal movie collections and watchlists            |
+| 🛡️ **Admin Panel**       | Administrative controls for content moderation       |
+| 📱 **File Upload**       | Image and media handling with cloud storage          |
+| 📊 **Analytics**         | Comprehensive statistics and reporting               |
+
+## 🛠️ Tech Stack
+
+<div align="center">
+
+| Technology                                                                                                        | Purpose             | Version |
+| ----------------------------------------------------------------------------------------------------------------- | ------------------- | ------- |
+| ![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)             | Backend Framework   | 10+     |
+| ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)        | Runtime Environment | 18+     |
+| ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white) | Database            | 15+     |
+| ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)             | ORM                 | Latest  |
+| ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)            | Authentication      | -       |
+| ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)          | Documentation       | -       |
+
+</div>
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js (v18+)
+- PostgreSQL (v15+)
+- pnpm (recommended)
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/movie-app-backend.git
+cd movie-app-backend
+
+# Install dependencies
+pnpm install
+
+# Setup environment variables
+cp .env.example .env
+# Edit .env with your configurations
+
+# Setup database
+pnpm prisma generate
+pnpm prisma migrate dev
+
+# Start development server
+pnpm start:dev
+```
+
+🎉 **Your API is now running on** `http://localhost:3000`
+
+📖 **Swagger Documentation:** `http://localhost:3000/api`
+
+## 📝 Environment Setup
+
+Create a `.env` file with these essential variables:
+
+```env
+# Server
+PORT=3000
+NODE_ENV=development
+
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/movieapp"
+
+# Authentication
+JWT_SECRET=your-super-secret-key
+JWT_EXPIRES_IN=7d
+```
+
+## 📚 API Overview
+
+### 🔗 Base URL
+
+```
+http://localhost:3000/api/v1
+```
+
+### 🎯 Main Endpoints
+
+| Module         | Endpoint     | Description                      |
+| -------------- | ------------ | -------------------------------- |
+| 🔐 **Auth**    | `/auth/*`    | Authentication & user management |
+| 🎬 **Movies**  | `/movies/*`  | Movie CRUD operations            |
+| ⭐ **Reviews** | `/reviews/*` | User reviews and ratings         |
+| 👤 **Users**   | `/users/*`   | User profiles and preferences    |
+| 🛡️ **Admin**   | `/admin/*`   | Administrative functions         |
+
+### 🔑 Authentication
+
+All protected endpoints require a Bearer token:
+
+```bash
+curl -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+     http://localhost:3000/api/v1/movies
+```
+
+### Production Commands
+
+```bash
+# Build for production
+pnpm build
+
+# Start production server
+pnpm start:prod
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how to get started:
+
+1. 🍴 Fork the repository
+2. 🌿 Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. 💾 Commit your changes (`git commit -m 'Add amazing feature'`)
+4. 📤 Push to the branch (`git push origin feature/amazing-feature`)
+5. 🔄 Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+## 🌟 Connect With Us
+
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/your-username)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/your-profile)
+[![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/your-handle)
+[![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://instagram.com/your-profile)
+[![Telegram](https://img.shields.io/badge/Telegram-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/your-username)
+
+---
+
+<p>
+  <b>⭐ Star this repository if you found it helpful!</b><br>
+  Made with ❤️ for the developer community
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+<img src="https://komarev.com/ghpvc/?username=your-username&label=Profile%20views&color=0e75b6&style=flat" alt="profile views" />
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ pnpm install
-```
-
-## Compile and run the project
-
-```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+</div>

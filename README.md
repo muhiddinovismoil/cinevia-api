@@ -87,7 +87,7 @@ pnpm start:dev
 
 🎉 **Your API is now running on** `http://localhost:3000`
 
-📖 **Swagger Documentation:** `http://localhost:3000/api`
+📖 **Swagger Documentation:** `http://localhost:3000/api/docs`
 
 ## 📝 Environment Setup
 

@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppConfigOptions } from 'config/app.config';
 import * as basicAuth from 'express-basic-auth';
+import helmet from 'helmet';
 
 import { AppModule } from './app';
 
@@ -22,6 +23,7 @@ async function bootstrap() {
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.enableVersioning({ defaultVersion: '1', type: VersioningType.URI });
+  app.use(helmet());
 
   app.use(
     '/api/docs',

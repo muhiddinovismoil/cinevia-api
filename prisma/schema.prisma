@@ -20,6 +20,21 @@ enum RoleTypes {
   @@map("role_types")
 }
 
+enum MovieTypes {
+  MOVIE
+  SERIES
+  CARTOON
+
+  @@map("movie_types")
+}
+
+enum UploadTypes {
+  LOCAL
+  EXTERNAL
+
+  @@map("upload_types")
+}
+
 model User {
   id       String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid
   email    String    @unique @map("email") @db.VarChar(255)
@@ -33,4 +48,68 @@ model User {
 
   @@id([id])
   @@map("users")
+}
+
+model Categories {
+  id        String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid
+  title     String    @unique @map("title") @db.VarChar(100)
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamp
+  Movies    Movies[]
+
+  @@id([id])
+  @@map("categories")
+}
+
+model Movies {
+  id          String      @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid
+  title       String      @unique @map("title") @db.VarChar(100)
+  description String?     @map("description") @db.Text
+  thumbnail   String?     @map("thumbnail")
+  type        MovieTypes  @map("type")
+  uploadType  UploadTypes @map("upload_type")
+  source      String      @map("source")
+  duration    Int?        @map("duration") @db.Integer
+  categoryId  String      @map("category_id") @db.Uuid
+  category    Categories  @relation(fields: [categoryId], references: [id])
+
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamp
+  Season    Season[]
+
+  @@id([id])
+  @@map("movies")
+}
+
+model Season {
+  id       String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid
+  title    String    @map("title")
+  number   Int       @map("number") @db.Integer
+  movieId  String    @map("movie_id") @db.Uuid
+  movie    Movies    @relation(fields: [movieId], references: [id])
+  episodes Episode[]
+
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamp
+
+  @@id([id])
+  @@map("seasons")
+}
+
+model Episode {
+  id         String      @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid
+  title      String      @map("title") @db.VarChar(255)
+  number     Int         @map("number") @db.Integer
+  uploadType UploadTypes @map("upload_type")
+  source     String      @map("source")
+  duration   Int?        @map("duration") @db.Integer
+  thumbnail  String?     @map("thumbnail")
+  seasonId   String      @map("season_id") @db.Uuid
+  season     Season      @relation(fields: [seasonId], references: [id])
+
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamp
+
+  @@id([id])
+  @@map("episodes")
 }

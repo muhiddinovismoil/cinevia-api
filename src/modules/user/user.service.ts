@@ -1,13 +1,20 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '@prisma';
+import { ServiceExceptions } from '@utils';
 
 @Injectable()
 export class UserService {
+  constructor(private readonly prisma: PrismaService) {}
   create() {
     return 'This action adds a new ';
   }
 
-  findAll() {
-    return `This action returns all s`;
+  async findOneByCredentials(email: string) {
+    try {
+      return await this.prisma.user.findFirst({ where: { email } });
+    } catch (error) {
+      ServiceExceptions.handle(error, UserService.name, 'findOneByCredentials');
+    }
   }
 
   findOne(id: string) {

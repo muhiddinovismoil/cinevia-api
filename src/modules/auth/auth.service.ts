@@ -3,6 +3,9 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '@prisma';
+import { ServiceExceptions } from '@utils';
+
+import { SignUpUserDto } from './dto/request';
 
 @Injectable()
 export class AuthService {
@@ -12,8 +15,12 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
-  create() {
-    return 'This action adds a new ';
+  async create(payload: SignUpUserDto) {
+    try {
+      
+    } catch (error) {
+      ServiceExceptions.handle(error, AuthService.name, 'create');
+    }
   }
 
   findAll() {

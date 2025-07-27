@@ -1,3 +1,4 @@
+import { AuthModule, UserModule } from '@modules';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { appConfig, databaseConfig } from 'config';
@@ -10,6 +11,8 @@ import { PrismaModule } from 'prisma';
       isGlobal: true,
     }),
     PrismaModule,
+    UserModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

@@ -1,4 +1,5 @@
 import { AuthModule, UserModule } from '@modules';
+import { RedisModule } from '@nestjs-modules/ioredis';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { Module } from '@nestjs/common';
@@ -37,12 +38,23 @@ import { PrismaModule } from 'prisma';
             },
           },
           template: {
-            dir: join(__dirname, 'service', 'mail', 'template'),
+            dir: join(__dirname, 'service'),
             adapter: new HandlebarsAdapter(),
             options: {
               strict: true,
             },
           },
+        };
+      },
+    }),
+    RedisModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const databaseConfig = configService.get('database');
+        return {
+          type: 'single',
+          url: databaseConfig,
         };
       },
     }),

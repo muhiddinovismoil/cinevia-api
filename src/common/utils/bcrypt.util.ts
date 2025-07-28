@@ -2,7 +2,7 @@ import { compare, genSalt, hash } from 'bcrypt';
 
 export async function hashPass(
   password: string,
-  saltRounds: number = 10,
+  saltRounds: number = 12,
 ): Promise<string> {
   try {
     const salt = await genSalt(saltRounds);

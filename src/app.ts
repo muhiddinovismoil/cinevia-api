@@ -1,10 +1,13 @@
+import { RolesGuard } from '@guards';
 import { AuthModule, UserModule } from '@modules';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { AuthGuard } from 'common/guards/auth.guard';
 import { appConfig, databaseConfig, jwtConfig, mailerConfig } from 'config';
 import { join } from 'path';
 import { PrismaModule } from 'prisma';
@@ -55,6 +58,19 @@ import { PrismaModule } from 'prisma';
     UserModule,
     AuthModule,
   ],
-  providers: [{ provide: 'APP_GUARD', useClass: ThrottlerGuard }],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

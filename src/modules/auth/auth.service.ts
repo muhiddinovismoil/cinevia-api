@@ -13,7 +13,7 @@ import { RoleTypes, User } from '@prisma/client';
 import { AppMailService, RedisCacheService } from '@services';
 import { ServiceExceptions, hashPass, verifyPass } from '@utils';
 
-import { SignInUserDto, SignUpUserDto, VerifyOtpDto } from './dto/request';
+import { SignInDto, SignUpUserDto, VerifyOtpDto } from './dto/request';
 
 @Injectable()
 export class AuthService {
@@ -42,13 +42,13 @@ export class AuthService {
       await this.cache.set(userKey, JSON.stringify(userData));
       const { keyHash, otp } = await this.cache.sendOtp();
       await this.mailer.sendOtp(payload.email, payload.fullname, otp);
-      return { statusCode: HttpStatus.OK, data: keyHash };
+      return { statusCode: HttpStatus.OK, data: { keyHash: keyHash } };
     } catch (error) {
       ServiceExceptions.handle(error, AuthService.name, 'create');
     }
   }
 
-  async signin(payload: SignInUserDto) {
+  async signin(payload: SignInDto) {
     try {
       const user = await this.userService.findOneByCredentials(payload.email);
 
@@ -60,13 +60,17 @@ export class AuthService {
 
       const { accessToken, refreshToken } = await this.getTokens(user);
 
-      return { statusCode: HttpStatus.OK, data: { accessToken, refreshToken } };
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'OK',
+        data: { accessToken, refreshToken },
+      };
     } catch (error) {
       ServiceExceptions.handle(error, AuthService.name, 'signin');
     }
   }
 
-  async signinAsAdmin(payload: SignInUserDto) {
+  async signinAsAdmin(payload: SignInDto) {
     try {
       const user = await this.userService.findOneByCredentials(
         payload.email,
@@ -75,6 +79,18 @@ export class AuthService {
       if (!user) {
         throw new ForbiddenException('You do not have access to login');
       }
+
+      const verify = await verifyPass(user.password, payload.password);
+
+      if (!verify) throw new BadRequestException();
+
+      const { accessToken, refreshToken } = await this.getTokens(user);
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'OK',
+        data: { accessToken, refreshToken },
+      };
     } catch (error) {
       ServiceExceptions.handle(error, AuthService.name, 'signinAsAdmin');
     }

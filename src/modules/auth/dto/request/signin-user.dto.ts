@@ -3,7 +3,7 @@ import {
   IsEmail,
   IsNotEmpty,
   IsString,
-  IsStrongPassword,
+  MinLength,
 } from 'class-validator';
 
 export class SignInUserDto {
@@ -14,8 +14,8 @@ export class SignInUserDto {
   email: string;
 
   @ApiProperty()
-  @IsStrongPassword()
   @IsString()
+  @MinLength(8)
   @IsNotEmpty()
   password: string;
 }

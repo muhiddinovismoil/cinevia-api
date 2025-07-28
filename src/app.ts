@@ -1,7 +1,6 @@
 import { AuthModule, UserModule } from '@modules';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -35,13 +34,6 @@ import { PrismaModule } from 'prisma';
             auth: {
               user: mailConfig.user,
               pass: mailConfig.pass,
-            },
-          },
-          template: {
-            dir: join(__dirname, 'service'),
-            adapter: new HandlebarsAdapter(),
-            options: {
-              strict: true,
             },
           },
         };

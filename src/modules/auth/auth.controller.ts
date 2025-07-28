@@ -2,7 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
-import { SignUpUserDto } from './dto/request';
+import { SignInUserDto, SignUpUserDto, VerifyOtpDto } from './dto/request';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -15,7 +15,9 @@ export class AuthController {
   }
 
   @Post('signin')
-  async signInAsUser() {}
+  async signInAsUser(@Body() payload: SignInUserDto) {
+    return await this.authService.signin(payload);
+  }
 
   @Post('admin/signin')
   async signInAsAdmin() {}
@@ -34,5 +36,7 @@ export class AuthController {
   async changePassword() {}
 
   @Post('verify')
-  async verifyUser() {}
+  async verifyUser(@Body() payload: VerifyOtpDto) {
+    return await this.authService.verify(payload);
+  }
 }

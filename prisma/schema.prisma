@@ -38,7 +38,7 @@ enum UploadTypes {
 model User {
   id       String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid
   email    String    @unique @map("email") @db.VarChar(255)
-  fullName String    @map("fullname") @db.VarChar(60)
+  fullname String    @map("fullname") @db.VarChar(60)
   password String    @map("password") @db.VarChar(255)
   role     RoleTypes @default(USER) @map("role_types")
   photo    String?   @map("photo")

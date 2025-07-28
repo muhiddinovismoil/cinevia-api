@@ -2,7 +2,7 @@ import { compare, genSalt, hash } from 'bcrypt';
 
 export async function hashPass(
   password: string,
-  saltRounds: number = 12,
+  saltRounds: number = 10,
 ): Promise<string> {
   try {
     const salt = await genSalt(saltRounds);
@@ -18,7 +18,7 @@ export async function verifyPass(
   password: string,
 ): Promise<boolean> {
   try {
-    return await compare(oldPassword, password);
+    return await compare(password, oldPassword);
   } catch (error) {
     console.error('Password verification failed:', error.message);
     throw new Error('Failed to verify password');

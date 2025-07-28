@@ -1,15 +1,18 @@
 import { AuthModule, UserModule } from '@modules';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { appConfig, databaseConfig } from 'config';
+import { appConfig, databaseConfig, jwtConfig, mailerConfig } from 'config';
+import { join } from 'path';
 import { PrismaModule } from 'prisma';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [appConfig, databaseConfig],
+      load: [appConfig, databaseConfig, jwtConfig, mailerConfig],
       isGlobal: true,
     }),
     ThrottlerModule.forRoot([
@@ -18,6 +21,31 @@ import { PrismaModule } from 'prisma';
         limit: 3,
       },
     ]),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const mailConfig = configService.get('mailer');
+        return {
+          transport: {
+            host: mailConfig.host,
+            port: mailConfig.port,
+            secure: false,
+            auth: {
+              user: mailConfig.user,
+              pass: mailConfig.pass,
+            },
+          },
+          template: {
+            dir: join(__dirname, 'service', 'mail', 'template'),
+            adapter: new HandlebarsAdapter(),
+            options: {
+              strict: true,
+            },
+          },
+        };
+      },
+    }),
     JwtModule.register({ global: true }),
     PrismaModule,
     UserModule,

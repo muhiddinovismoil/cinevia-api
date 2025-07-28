@@ -1,11 +1,16 @@
 import { UserService } from '@modules';
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '@prisma';
-import { ServiceExceptions } from '@utils';
+import { RoleTypes } from '@prisma/client';
+import { ServiceExceptions, hashPass } from '@utils';
 
-import { SignUpUserDto } from './dto/request';
+import { SignInUserDto, SignUpUserDto } from './dto/request';
 
 @Injectable()
 export class AuthService {
@@ -17,18 +22,36 @@ export class AuthService {
   ) {}
   async create(payload: SignUpUserDto) {
     try {
-      
+      const user = await this.userService.findOneByCredentials(payload.email);
+      if (user)
+        throw new ConflictException('User with this email already exists');
+      const hashedPass = await hashPass(payload.password);
     } catch (error) {
       ServiceExceptions.handle(error, AuthService.name, 'create');
     }
   }
 
-  findAll() {
-    return `This action returns all s`;
+  async signin(payload: SignInUserDto) {
+    try {
+      const user = await this.userService.findOneByCredentials(payload.email);
+      if (user) throw new ForbiddenException('You do not have access to login');
+    } catch (error) {
+      ServiceExceptions.handle(error, AuthService.name, 'signin');
+    }
   }
 
-  findOne(id: string) {
-    return `This action returns a #id `;
+  async signinAsAdmin(payload: SignInUserDto) {
+    try {
+      const user = await this.userService.findOneByCredentials(
+        payload.email,
+        RoleTypes.ADMIN,
+      );
+      if (!user) {
+        throw new ForbiddenException('You do not have access to login');
+      }
+    } catch (error) {
+      ServiceExceptions.handle(error, AuthService.name, 'signinAsAdmin');
+    }
   }
 
   update(id: string) {

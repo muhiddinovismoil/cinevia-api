@@ -19,6 +19,8 @@ import { ICurrentUser } from '@type';
 import { AuthService } from './auth.service';
 import {
   ChangePasswordDto,
+  ForgetPasswordDto,
+  ResetPasswordDto,
   SignInDto,
   SignUpUserDto,
   VerifyOtpDto,
@@ -92,6 +94,7 @@ export class AuthController {
 
   @Public()
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ description: 'Password reset successfully' })
   @ApiForbiddenResponse({
     type: ForbiddenExceptionDto,
     description: 'Forbidden',
@@ -105,12 +108,13 @@ export class AuthController {
     description: 'Internal server error',
   })
   @Post('reset-password')
-  async resetPassword() {
-    return { message: 'Hello reset password' };
+  async resetPassword(@Body() payload: ResetPasswordDto) {
+    return await this.authService.resetPassword(payload);
   }
 
   @Public()
   @HttpCode(HttpStatus.OK)
+  @ApiSuccessResponse(SignUpUserResponseDto)
   @ApiForbiddenResponse({
     type: ForbiddenExceptionDto,
     description: 'Forbidden',
@@ -124,7 +128,9 @@ export class AuthController {
     description: 'Internal server error',
   })
   @Post('forget-password')
-  async forgetPassword() {}
+  async forgetPassword(@Body() payload: ForgetPasswordDto) {
+    return await this.authService.forgetPassword(payload);
+  }
 
   @Public()
   @HttpCode(HttpStatus.OK)

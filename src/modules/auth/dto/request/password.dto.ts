@@ -7,3 +7,22 @@ export class ChangePasswordDto {
   @ApiProperty()
   password: string;
 }
+
+export class ResetPasswordDto {
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  code: string;
+
+  @ApiProperty()
+  hashCode: string;
+}
+
+export class ForgetPasswordDto {
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  newPassword: string;
+}

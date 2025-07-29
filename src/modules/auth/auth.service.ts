@@ -16,6 +16,8 @@ import { ServiceExceptions, hashPass, verifyPass } from '@utils';
 
 import {
   ChangePasswordDto,
+  ForgetPasswordDto,
+  ResetPasswordDto,
   SignInDto,
   SignUpUserDto,
   VerifyOtpDto,
@@ -73,6 +75,39 @@ export class AuthService {
       };
     } catch (error) {
       ServiceExceptions.handle(error, AuthService.name, 'signin');
+    }
+  }
+
+  async forgetPassword({ email, newPassword }: ForgetPasswordDto) {
+    try {
+      const user = await this.userService.findOneByCredentials(email);
+      if (!user) throw new NotFoundException('User not found');
+      await this.cache.set(email, newPassword);
+      const { keyHash, otp } = await this.cache.sendOtp();
+      await this.mailer.sendOtp(email, user.fullname, otp);
+      return { data: keyHash };
+    } catch (error) {
+      ServiceExceptions.handle(error, AuthService.name, 'forgetPassword');
+    }
+  }
+
+  async resetPassword({ email, hashCode, code }: ResetPasswordDto) {
+    try {
+      const user = await this.userService.findOneByCredentials(email);
+      if (!user) throw new NotFoundException('Invalid or expired token');
+      const isVerify = await this.cache.verifyOtp(hashCode, code);
+      if (!isVerify) {
+        throw new BadRequestException('code xato kiritildi');
+      }
+      const newPassword = await this.cache.get(email);
+      const hashedPassword = await hashPass(newPassword);
+
+      await this.cache.del(email);
+      await this.cache.del(hashCode);
+      await this.userService.updatePassword(user.id, hashedPassword);
+      return { message: 'Password reset successfull' };
+    } catch (error) {
+      ServiceExceptions.handle(error, AuthService.name, 'resetPassword');
     }
   }
 

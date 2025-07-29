@@ -20,6 +20,7 @@ import { AuthService } from './auth.service';
 import {
   ChangePasswordDto,
   ForgetPasswordDto,
+  ResendOtpDto,
   ResetPasswordDto,
   SignInDto,
   SignUpUserDto,
@@ -134,6 +135,7 @@ export class AuthController {
 
   @Public()
   @HttpCode(HttpStatus.OK)
+  @ApiSuccessResponse(SignUpUserResponseDto)
   @ApiForbiddenResponse({
     type: ForbiddenExceptionDto,
     description: 'Forbidden',
@@ -147,7 +149,9 @@ export class AuthController {
     description: 'Internal server error',
   })
   @Post('resend-otp')
-  async resendOtp() {}
+  async resendOtp(@Body() payload: ResendOtpDto) {
+    return await this.authService.resendOtp(payload);
+  }
 
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)

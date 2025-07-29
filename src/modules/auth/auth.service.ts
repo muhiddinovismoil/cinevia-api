@@ -17,6 +17,7 @@ import { ServiceExceptions, hashPass, verifyPass } from '@utils';
 import {
   ChangePasswordDto,
   ForgetPasswordDto,
+  ResendOtpDto,
   ResetPasswordDto,
   SignInDto,
   SignUpUserDto,
@@ -134,6 +135,19 @@ export class AuthService {
       };
     } catch (error) {
       ServiceExceptions.handle(error, AuthService.name, 'signinAsAdmin');
+    }
+  }
+
+  async resendOtp({ email, hashCode }: ResendOtpDto) {
+    try {
+      const user = await this.userService.findOneByCredentials(email);
+      if (!user) throw new NotFoundException('User not found');
+      await this.cache.del(hashCode);
+      const { keyHash, otp } = await this.cache.sendOtp();
+      await this.mailer.sendOtp(email, user.fullname, otp);
+      return { data: keyHash };
+    } catch (error) {
+      ServiceExceptions.handle(error, AuthService.name, 'resendOtp');
     }
   }
 

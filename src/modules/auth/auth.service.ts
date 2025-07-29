@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   HttpStatus,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -13,7 +14,12 @@ import { RoleTypes, User } from '@prisma/client';
 import { AppMailService, RedisCacheService } from '@services';
 import { ServiceExceptions, hashPass, verifyPass } from '@utils';
 
-import { SignInDto, SignUpUserDto, VerifyOtpDto } from './dto/request';
+import {
+  ChangePasswordDto,
+  SignInDto,
+  SignUpUserDto,
+  VerifyOtpDto,
+} from './dto/request';
 
 @Injectable()
 export class AuthService {
@@ -128,6 +134,28 @@ export class AuthService {
       await this.cache.del(userKey);
     } catch (error) {
       ServiceExceptions.handle(error, AuthService.name, 'verify');
+    }
+  }
+
+  async changePassword(
+    id: string,
+    { oldPassword, password }: ChangePasswordDto,
+  ) {
+    try {
+      const user = await this.prisma.user.findFirst({ where: { id } });
+      if (!user) throw new NotFoundException('User not found');
+      const comparePassword = await verifyPass(oldPassword, password);
+      if (!comparePassword)
+        throw new BadRequestException('Invalid current password');
+      if (oldPassword === password)
+        throw new BadRequestException(
+          'New password cannot be the same as the current password',
+        );
+      const hashedPassword = await hashPass(password);
+      await this.userService.updatePassword(id, hashedPassword);
+      return { message: 'Password changed successfully' };
+    } catch (error) {
+      ServiceExceptions.handle(error, AuthService.name, 'changePassword');
     }
   }
 

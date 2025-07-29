@@ -1,4 +1,4 @@
-import { ApiSuccessResponse, Public } from '@decorators';
+import { ApiSuccessResponse, CurrentUser, Public } from '@decorators';
 import {
   ForbiddenExceptionDto,
   InternalServerErrorExceptionDto,
@@ -9,13 +9,20 @@ import {
   ApiBearerAuth,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
+  ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
+import { ICurrentUser } from '@type';
 
 import { AuthService } from './auth.service';
-import { SignInDto, SignUpUserDto, VerifyOtpDto } from './dto/request';
+import {
+  ChangePasswordDto,
+  SignInDto,
+  SignUpUserDto,
+  VerifyOtpDto,
+} from './dto/request';
 import { SignInResponseDto, SignUpUserResponseDto } from './dto/response';
 
 @ApiTags('Auth')
@@ -138,6 +145,7 @@ export class AuthController {
 
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ description: 'Password changed successfully' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiForbiddenResponse({
     type: ForbiddenExceptionDto,
@@ -152,8 +160,11 @@ export class AuthController {
     description: 'Internal server error',
   })
   @Post('change-password')
-  async changePassword() {
-    return { message: 'something' };
+  async changePassword(
+    @CurrentUser() user: ICurrentUser,
+    @Body() payload: ChangePasswordDto,
+  ) {
+    return await this.authService.changePassword(user.id, payload);
   }
 
   @Public()

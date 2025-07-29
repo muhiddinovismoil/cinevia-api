@@ -3,8 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppConfigOptions } from 'config/app.config';
+import * as express from 'express';
 import * as basicAuth from 'express-basic-auth';
 import helmet from 'helmet';
+import { join } from 'path';
 
 import { AppModule } from './app';
 
@@ -24,6 +26,9 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.enableVersioning({ defaultVersion: '1', type: VersioningType.URI });
   app.use(helmet());
+
+  app.use('/uploads', express.static(join(__dirname, '..', 'static')));
+  app.use('/media', express.static(join(__dirname, '..', 'static')));
 
   app.use(
     '/api/docs',

@@ -27,8 +27,7 @@ async function bootstrap() {
   app.enableVersioning({ defaultVersion: '1', type: VersioningType.URI });
   app.use(helmet());
 
-  app.use('/uploads', express.static(join(__dirname, '..', 'static')));
-  app.use('/media', express.static(join(__dirname, '..', 'static')));
+  app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
 
   app.use(
     '/api/docs',

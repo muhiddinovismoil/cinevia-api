@@ -22,10 +22,18 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const appConfig = configService.get<AppConfigOptions>('app');
   app.setGlobalPrefix('api');
-  app.enableCors();
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+  app.enableCors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  });
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+    }),
+  );
   app.enableVersioning({ defaultVersion: '1', type: VersioningType.URI });
-  app.use(helmet());
 
   app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
 

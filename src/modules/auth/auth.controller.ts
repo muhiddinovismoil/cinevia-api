@@ -171,8 +171,8 @@ export class AuthController {
   })
   @Post('change-password')
   async changePassword(
-    @CurrentUser() user: ICurrentUser,
     @Body() payload: ChangePasswordDto,
+    @CurrentUser() user: ICurrentUser,
   ) {
     return await this.authService.changePassword(user.id, payload);
   }

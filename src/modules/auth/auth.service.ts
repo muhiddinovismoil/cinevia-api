@@ -193,7 +193,7 @@ export class AuthService {
     try {
       const user = await this.prisma.user.findFirst({ where: { id } });
       if (!user) throw new NotFoundException('User not found');
-      const comparePassword = await verifyPass(oldPassword, password);
+      const comparePassword = await verifyPass(user.password, oldPassword);
       if (!comparePassword)
         throw new BadRequestException('Invalid current password');
       if (oldPassword === password)

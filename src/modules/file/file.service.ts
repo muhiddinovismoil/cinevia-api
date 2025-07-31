@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { randomBytes } from 'crypto';
-import { Express } from 'express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 
@@ -42,19 +41,27 @@ export class FileService {
 
   async uploadPhoto(file: Express.Multer.File) {
     return {
-      filename: file.filename,
-      mimetype: file.mimetype,
-      size: file.size,
-      path: file.path,
+      message: 'Photo uploaded successfully',
+      statusCode: HttpStatus.CREATED,
+      data: {
+        filename: file.filename,
+        mimetype: file.mimetype,
+        size: file.size,
+        path: file.path,
+      },
     };
   }
 
   async uploadMedia(file: Express.Multer.File) {
     return {
-      filename: file.filename,
-      mimetype: file.mimetype,
-      size: file.size,
-      path: file.path,
+      message: 'Media uploaded successfully',
+      statusCode: HttpStatus.CREATED,
+      data: {
+        filename: file.filename,
+        mimetype: file.mimetype,
+        size: file.size,
+        path: file.path,
+      },
     };
   }
 }

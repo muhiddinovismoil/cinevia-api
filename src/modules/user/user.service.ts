@@ -3,12 +3,11 @@ import { PrismaService } from '@prisma';
 import { RoleTypes } from '@prisma/client';
 import { ServiceExceptions } from '@utils';
 
+import { UpdateProfileDto } from './dto/request';
+
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
-  create() {
-    return 'This action adds a new ';
-  }
 
   async findOneByCredentials(email: string, role?: RoleTypes) {
     try {
@@ -43,7 +42,26 @@ export class UserService {
     }
   }
 
-  remove(id: string) {
-    return `This action removes a #id `;
+  async updateProfile(id: string, payload: UpdateProfileDto) {
+    try {
+      const data = this.findOne(id);
+      const updatedData = await this.prisma.user.update({
+        where: { id },
+        data: {
+          fullname: payload.fullname,
+          email: payload.email,
+          photo: payload.photo,
+        },
+        select: {
+          id: true,
+          fullname: true,
+          photo: true,
+          email: true,
+        },
+      });
+      return { message: 'Profile updated successfully', data: updatedData };
+    } catch (error) {
+      ServiceExceptions.handle(error, UserService.name, 'updateProfile');
+    }
   }
 }

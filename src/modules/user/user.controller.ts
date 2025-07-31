@@ -5,13 +5,12 @@ import {
   UnprocessableEntityExceptionDto,
 } from '@dtos';
 import {
+  Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   HttpStatus,
-  Post,
-  Put,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -22,6 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { ICurrentUser } from '@type';
 
+import { UpdateProfileDto } from './dto/request';
 import { GetProfileResponseDto } from './dto/response';
 import { UserService } from './user.service';
 
@@ -30,8 +30,6 @@ import { UserService } from './user.service';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-  @Post()
-  create() {}
 
   @HttpCode(HttpStatus.OK)
   @ApiSuccessResponse(GetProfileResponseDto)
@@ -52,9 +50,25 @@ export class UserController {
     return await this.userService.findOne(user.id);
   }
 
-  @Put('/:id')
-  update() {}
-
-  @Delete('/:id')
-  delete() {}
+  @HttpCode(HttpStatus.OK)
+  @ApiSuccessResponse(GetProfileResponseDto)
+  @ApiForbiddenResponse({
+    type: ForbiddenExceptionDto,
+    description: 'Forbidden',
+  })
+  @ApiUnprocessableEntityResponse({
+    type: UnprocessableEntityExceptionDto,
+    description: 'Unprocessable entity',
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerErrorExceptionDto,
+    description: 'Internal server error',
+  })
+  @Patch('update/profile')
+  async updateProfile(
+    @CurrentUser() user: ICurrentUser,
+    @Body() payload: UpdateProfileDto,
+  ) {
+    return await this.userService.updateProfile(user.id, payload);
+  }
 }

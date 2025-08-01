@@ -1,24 +1,37 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '@prisma';
+import { ServiceExceptions } from '@utils';
 
 @Injectable()
 export class CategoryService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create() {
-    return 'This action adds a new ';
+    try {
+    } catch (error) {
+      ServiceExceptions.handle(error, CategoryService.name, 'create');
+    }
   }
 
-  findAll() {
-    return `This action returns all s`;
+  async findAll() {
+    try {
+      return (await this.prisma.category.findMany()) ?? [];
+    } catch (error) {
+      ServiceExceptions.handle(error, CategoryService.name, 'findAll');
+    }
   }
 
   findOne() {
-    return `This action returns a #id `;
+    try {
+    } catch (error) {
+      ServiceExceptions.handle(error, CategoryService.name, 'findOne');
+    }
   }
 
   update() {
-    return `This action updates a #id `;
-  }
-
-  remove() {
-    return `This action removes a #id `;
+    try {
+    } catch (error) {
+      ServiceExceptions.handle(error, CategoryService.name, 'update');
+    }
   }
 }

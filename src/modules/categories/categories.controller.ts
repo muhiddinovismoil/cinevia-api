@@ -1,16 +1,28 @@
-import { Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import { Controller, Get, Patch, Post } from '@nestjs/common';
+
+import { CategoryService } from './categories.service';
 
 @Controller('category')
 export class CategoryController {
-  @Post()
-  create() {}
+  constructor(private readonly categoryService: CategoryService) {}
+
+  @Post('create')
+  async createCategory() {
+    return await this.categoryService.create();
+  }
 
   @Get()
-  findAll() {}
+  async getAllCategories() {
+    return await this.categoryService.findAll();
+  }
 
-  @Put('/:id')
-  update() {}
+  @Get('/:id')
+  async getCategoryById() {
+    return await this.categoryService.findOne();
+  }
 
-  @Delete('/:id')
-  delete() {}
+  @Patch('/:id')
+  async updateCategoryById() {
+    return await this.categoryService.update();
+  }
 }

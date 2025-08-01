@@ -1,16 +1,15 @@
-import { Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import { CurrentUser } from '@decorators';
+import { Controller, Get } from '@nestjs/common';
+import { ICurrentUser } from '@type';
+
+import { AdminService } from './admin.service';
 
 @Controller('admin')
 export class AdminController {
-  @Post()
-  create() {}
+  constructor(private readonly adminService: AdminService) {}
 
-  @Get()
-  findAll() {}
-
-  @Put('/:id')
-  update() {}
-
-  @Delete('/:id')
-  delete() {}
+  @Get('/statistics')
+  async getStatistics(@CurrentUser() user: ICurrentUser) {
+    return await this.adminService.statistics(user.id);
+  }
 }

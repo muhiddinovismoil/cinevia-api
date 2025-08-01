@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '@prisma';
 import { RoleTypes } from '@prisma/client';
 import { ServiceExceptions } from '@utils';
@@ -45,6 +49,13 @@ export class UserService {
   async updateProfile(id: string, payload: UpdateProfileDto) {
     try {
       const data = this.findOne(id);
+      const isValidEmail = await this.prisma.user.findFirst({
+        where: { email: payload.email, NOT: { id } },
+      });
+      if (isValidEmail)
+        throw new BadRequestException(
+          'This email is already registered before',
+        );
       const updatedData = await this.prisma.user.update({
         where: { id },
         data: {

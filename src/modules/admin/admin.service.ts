@@ -1,24 +1,15 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '@prisma';
+import { ServiceExceptions } from '@utils';
 
 @Injectable()
 export class AdminService {
-  create() {
-    return 'This action adds a new ';
-  }
+  constructor(private readonly prisma: PrismaService) {}
 
-  findAll() {
-    return `This action returns all s`;
-  }
-
-  findOne() {
-    return `This action returns a #id `;
-  }
-
-  update() {
-    return `This action updates a #id `;
-  }
-
-  remove() {
-    return `This action removes a #id `;
+  async statistics(id: string) {
+    try {
+    } catch (error) {
+      ServiceExceptions.handle(error, AdminService.name, 'statistics');
+    }
   }
 }

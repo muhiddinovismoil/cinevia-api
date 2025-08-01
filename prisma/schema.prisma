@@ -35,81 +35,164 @@ enum UploadTypes {
   @@map("upload_types")
 }
 
+enum WatchStatus {
+  WATCHING
+  COMPLETED
+  PLAN_TO_WATCH
+
+  @@map("watch_status")
+}
+
 model User {
-  id       String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid
-  email    String    @unique @map("email") @db.VarChar(255)
-  fullname String    @map("fullname") @db.VarChar(60)
-  password String    @map("password") @db.VarChar(255)
-  role     RoleTypes @default(USER) @map("role_types")
-  photo    String?   @map("photo")
+  id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email    String    @unique @db.VarChar(255)
+  fullname String    @db.VarChar(100)
+  password String    @db.VarChar(255)
+  role     RoleTypes @default(USER)
+  photo    String?
 
-  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamp
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@id([id])
+  watchHistory WatchHistory[]
+  ratings      Rating[]
+  favorites    Favorite[]
+
   @@map("users")
 }
 
-model Categories {
-  id        String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid
-  title     String    @unique @map("title") @db.VarChar(100)
-  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamp
-  Movies    Movies[]
+model Category {
+  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique @db.VarChar(100)
+  slug String @unique @db.VarChar(120)
 
-  @@id([id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  movies Movie[]
+
   @@map("categories")
 }
 
-model Movies {
-  id          String      @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid
-  title       String      @unique @map("title") @db.VarChar(100)
-  description String?     @map("description") @db.Text
-  thumbnail   String?     @map("thumbnail")
-  type        MovieTypes  @map("type")
+model Movie {
+  id          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String      @db.VarChar(255)
+  description String?     @db.Text
+  slug        String      @unique @db.VarChar(300)
+  thumbnail   String?
+  type        MovieTypes
   uploadType  UploadTypes @map("upload_type")
-  source      String      @map("source")
-  duration    Int?        @map("duration") @db.Integer
-  categoryId  String      @map("category_id") @db.Uuid
-  category    Categories  @relation(fields: [categoryId], references: [id])
+  source      String
+  duration    Int?        @db.Integer
+  releaseYear Int?        @map("release_year")
+  country     String?     @db.VarChar(100)
+  director    String?     @db.VarChar(255)
+  cast        String?     @db.Text
+  imdbRating  Float?      @map("imdb_rating") @db.Real
 
-  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamp
-  Season    Season[]
+  viewCount     Int   @default(0) @map("view_count")
+  averageRating Float @default(0) @map("average_rating") @db.Real
 
-  @@id([id])
+  categoryId String @map("category_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  category     Category       @relation(fields: [categoryId], references: [id])
+  seasons      Season[]
+  watchHistory WatchHistory[]
+  ratings      Rating[]
+  favorites    Favorite[]
+
+  @@index([type])
+  @@index([categoryId])
+  @@index([averageRating])
   @@map("movies")
 }
 
 model Season {
-  id       String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid
-  title    String    @map("title")
-  number   Int       @map("number") @db.Integer
-  movieId  String    @map("movie_id") @db.Uuid
-  movie    Movies    @relation(fields: [movieId], references: [id])
+  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title   String @db.VarChar(255)
+  number  Int    @db.Integer
+  movieId String @map("movie_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  movie    Movie     @relation(fields: [movieId], references: [id], onDelete: Cascade)
   episodes Episode[]
 
-  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamp
-
-  @@id([id])
+  @@unique([movieId, number])
   @@map("seasons")
 }
 
 model Episode {
-  id         String      @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid
-  title      String      @map("title") @db.VarChar(255)
-  number     Int         @map("number") @db.Integer
+  id         String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title      String      @db.VarChar(255)
+  number     Int         @db.Integer
   uploadType UploadTypes @map("upload_type")
-  source     String      @map("source")
-  duration   Int?        @map("duration") @db.Integer
-  thumbnail  String?     @map("thumbnail")
+  source     String
+  duration   Int?        @db.Integer
+  thumbnail  String?
   seasonId   String      @map("season_id") @db.Uuid
-  season     Season      @relation(fields: [seasonId], references: [id])
 
-  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamp
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@id([id])
+  season       Season         @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  watchHistory WatchHistory[]
+
+  @@unique([seasonId, number])
   @@map("episodes")
+}
+
+model WatchHistory {
+  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String      @map("user_id") @db.Uuid
+  movieId         String      @map("movie_id") @db.Uuid
+  episodeId       String?     @map("episode_id") @db.Uuid
+  watchedDuration Int         @default(0) @map("watched_duration")
+  isCompleted     Boolean     @default(false) @map("is_completed")
+  status          WatchStatus @default(WATCHING)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie   Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  episode Episode? @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId, episodeId])
+  @@map("watch_history")
+}
+
+model Rating {
+  id      String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId  String  @map("user_id") @db.Uuid
+  movieId String  @map("movie_id") @db.Uuid
+  rating  Int     @db.SmallInt
+  review  String? @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
+  @@map("ratings")
+}
+
+model Favorite {
+  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId  String @map("user_id") @db.Uuid
+  movieId String @map("movie_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
+  @@map("favorites")
 }

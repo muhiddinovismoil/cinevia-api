@@ -9,7 +9,7 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Get('/statistics')
-  async getStatistics(@CurrentUser() user: ICurrentUser) {
-    return await this.adminService.statistics(user.id);
+  async getStatistics() {
+    return await this.adminService.statistics();
   }
 }

@@ -1,28 +1,118 @@
-import { Controller, Get, Patch, Post } from '@nestjs/common';
+import { ApiSuccessResponse, Roles } from '@decorators';
+import {
+  ForbiddenExceptionDto,
+  InternalServerErrorExceptionDto,
+  UnprocessableEntityExceptionDto,
+} from '@dtos';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiForbiddenResponse,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnprocessableEntityResponse,
+} from '@nestjs/swagger';
+import { RoleTypes } from '@prisma/client';
 
 import { CategoryService } from './categories.service';
+import { CreateCategoryDto } from './dto/request';
+import { GetAllCategoryResponseDto } from './dto/response';
 
+@ApiBearerAuth()
+@ApiTags('Categories')
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @Post('create')
-  async createCategory() {
-    return await this.categoryService.create();
+  @Roles(RoleTypes.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ description: 'Category created successfully' })
+  @ApiForbiddenResponse({
+    type: ForbiddenExceptionDto,
+    description: 'Forbidden',
+  })
+  @ApiUnprocessableEntityResponse({
+    type: UnprocessableEntityExceptionDto,
+    description: 'Unprocessable entity',
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerErrorExceptionDto,
+    description: 'Internal server error',
+  })
+  @Post()
+  async createCategory(@Body() payload: CreateCategoryDto) {
+    return await this.categoryService.create(payload);
   }
 
+  @HttpCode(HttpStatus.OK)
+  @ApiSuccessResponse(GetAllCategoryResponseDto, true)
+  @ApiForbiddenResponse({
+    type: ForbiddenExceptionDto,
+    description: 'Forbidden',
+  })
+  @ApiUnprocessableEntityResponse({
+    type: UnprocessableEntityExceptionDto,
+    description: 'Unprocessable entity',
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerErrorExceptionDto,
+    description: 'Internal server error',
+  })
   @Get()
   async getAllCategories() {
     return await this.categoryService.findAll();
   }
 
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ description: 'Category created successfully' })
+  @ApiForbiddenResponse({
+    type: ForbiddenExceptionDto,
+    description: 'Forbidden',
+  })
+  @ApiUnprocessableEntityResponse({
+    type: UnprocessableEntityExceptionDto,
+    description: 'Unprocessable entity',
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerErrorExceptionDto,
+    description: 'Internal server error',
+  })
   @Get('/:id')
-  async getCategoryById() {
-    return await this.categoryService.findOne();
+  async getCategoryById(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.categoryService.findOne(id);
   }
 
+  @Roles(RoleTypes.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ description: 'Category updated successfully' })
+  @ApiForbiddenResponse({
+    type: ForbiddenExceptionDto,
+    description: 'Forbidden',
+  })
+  @ApiUnprocessableEntityResponse({
+    type: UnprocessableEntityExceptionDto,
+    description: 'Unprocessable entity',
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerErrorExceptionDto,
+    description: 'Internal server error',
+  })
   @Patch('/:id')
-  async updateCategoryById() {
-    return await this.categoryService.update();
+  async updateCategoryById(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() payload: CreateCategoryDto,
+  ) {
+    return await this.categoryService.update(id, payload);
   }
 }

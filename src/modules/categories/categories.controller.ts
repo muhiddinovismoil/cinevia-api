@@ -1,5 +1,6 @@
 import { ApiSuccessResponse, Roles } from '@decorators';
 import {
+  BaseFindDto,
   ForbiddenExceptionDto,
   InternalServerErrorExceptionDto,
   UnprocessableEntityExceptionDto,
@@ -7,6 +8,7 @@ import {
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -14,6 +16,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -70,8 +73,8 @@ export class CategoryController {
     description: 'Internal server error',
   })
   @Get()
-  async getAllCategories() {
-    return await this.categoryService.findAll();
+  async getAllCategories(@Query() query: BaseFindDto) {
+    return await this.categoryService.findAll(query);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -114,5 +117,25 @@ export class CategoryController {
     @Body() payload: CreateCategoryDto,
   ) {
     return await this.categoryService.update(id, payload);
+  }
+
+  @Roles(RoleTypes.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ description: 'Category updated successfully' })
+  @ApiForbiddenResponse({
+    type: ForbiddenExceptionDto,
+    description: 'Forbidden',
+  })
+  @ApiUnprocessableEntityResponse({
+    type: UnprocessableEntityExceptionDto,
+    description: 'Unprocessable entity',
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerErrorExceptionDto,
+    description: 'Internal server error',
+  })
+  @Delete('/:id')
+  async removeCategoryById(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.categoryService.removeCategory(id);
   }
 }

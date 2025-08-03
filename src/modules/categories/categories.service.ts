@@ -1,3 +1,4 @@
+import { BaseFindDto } from '@dtos';
 import {
   ConflictException,
   HttpStatus,
@@ -30,10 +31,29 @@ export class CategoryService {
     }
   }
 
-  async findAll() {
+  async findAll({ pageNumber, pageSize }: BaseFindDto) {
     try {
-      const data = (await this.prisma.category.findMany()) ?? [];
-      return { message: 'All Categories fetch', data: data };
+      const skip = (pageNumber - 1) * pageSize;
+      const take = pageSize;
+      const [data, total] = await this.prisma.$transaction([
+        this.prisma.category.findMany({
+          skip,
+          take,
+          orderBy: { createdAt: 'desc' },
+        }),
+        this.prisma.category.count(),
+      ]);
+
+      return {
+        message: 'All Categories fetched',
+        data,
+        meta: {
+          total,
+          pageNumber,
+          pageSize,
+          totalPages: Math.ceil(total / pageSize),
+        },
+      };
     } catch (error) {
       ServiceExceptions.handle(error, CategoryService.name, 'findAll');
     }
@@ -71,6 +91,19 @@ export class CategoryService {
       };
     } catch (error) {
       ServiceExceptions.handle(error, CategoryService.name, 'update');
+    }
+  }
+
+  async removeCategory(id: string) {
+    try {
+      const data = await this.findOne(id);
+      await this.prisma.category.delete({ where: { id } });
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Category deleted successfully',
+      };
+    } catch (error) {
+      ServiceExceptions.handle(error, CategoryService.name, 'removeCategory');
     }
   }
 }

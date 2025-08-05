@@ -1,4 +1,3 @@
-import { BaseFindDto } from '@dtos';
 import {
   ConflictException,
   HttpStatus,
@@ -6,9 +5,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '@prisma';
-import { ServiceExceptions } from '@utils';
+import { ServiceExceptions, slugify } from '@utils';
 
-import { CreateCategoryDto, UpdateCategoryDto } from './dto/request';
+import {
+  CreateCategoryDto,
+  FindAllDto,
+  UpdateCategoryDto,
+} from './dto/request';
 
 @Injectable()
 export class CategoryService {
@@ -16,12 +19,13 @@ export class CategoryService {
 
   async create(payload: CreateCategoryDto) {
     try {
+      const slug = slugify(payload.name);
       const isCategoryExisted = await this.prisma.category.findFirst({
-        where: { name: payload.name },
+        where: { name: payload.name, slug },
       });
       if (isCategoryExisted)
         throw new ConflictException('Category exists with this name');
-      await this.prisma.category.create({ data: { ...payload } });
+      await this.prisma.category.create({ data: { slug: slug, ...payload } });
       return {
         statusCode: HttpStatus.OK,
         message: 'Category created successfully',
@@ -31,7 +35,7 @@ export class CategoryService {
     }
   }
 
-  async findAll({ pageNumber, pageSize }: BaseFindDto) {
+  async findAll({ pageNumber, pageSize, search }: FindAllDto) {
     try {
       const skip = (pageNumber - 1) * pageSize;
       const take = pageSize;
@@ -40,6 +44,14 @@ export class CategoryService {
           skip,
           take,
           orderBy: { createdAt: 'desc' },
+          where: search
+            ? {
+                name: {
+                  contains: search,
+                  mode: 'insensitive',
+                },
+              }
+            : undefined,
         }),
         this.prisma.category.count(),
       ]);
@@ -81,9 +93,15 @@ export class CategoryService {
   async update(id: string, payload: UpdateCategoryDto) {
     try {
       const data = await this.findOne(id);
+      const slug = slugify(payload.name);
+      const newDataIsExisted = await this.prisma.category.findFirst({
+        where: { slug, name: payload.name },
+      });
+      if (newDataIsExisted)
+        throw new ConflictException('This slug and name already existed');
       await this.prisma.category.update({
         where: { id },
-        data: { ...payload },
+        data: { slug: slug, ...payload },
       });
       return {
         statusCode: HttpStatus.OK,

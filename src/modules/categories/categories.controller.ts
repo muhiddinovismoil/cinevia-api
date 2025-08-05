@@ -1,6 +1,5 @@
 import { ApiSuccessResponse, Roles } from '@decorators';
 import {
-  BaseFindDto,
   ForbiddenExceptionDto,
   InternalServerErrorExceptionDto,
   UnprocessableEntityExceptionDto,
@@ -29,7 +28,7 @@ import {
 import { RoleTypes } from '@prisma/client';
 
 import { CategoryService } from './categories.service';
-import { CreateCategoryDto } from './dto/request';
+import { CreateCategoryDto, FindAllDto } from './dto/request';
 import { GetAllCategoryResponseDto } from './dto/response';
 
 @ApiBearerAuth()
@@ -73,27 +72,8 @@ export class CategoryController {
     description: 'Internal server error',
   })
   @Get()
-  async getAllCategories(@Query() query: BaseFindDto) {
+  async getAllCategories(@Query() query: FindAllDto) {
     return await this.categoryService.findAll(query);
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({ description: 'Category created successfully' })
-  @ApiForbiddenResponse({
-    type: ForbiddenExceptionDto,
-    description: 'Forbidden',
-  })
-  @ApiUnprocessableEntityResponse({
-    type: UnprocessableEntityExceptionDto,
-    description: 'Unprocessable entity',
-  })
-  @ApiInternalServerErrorResponse({
-    type: InternalServerErrorExceptionDto,
-    description: 'Internal server error',
-  })
-  @Get('/:id')
-  async getCategoryById(@Param('id', ParseUUIDPipe) id: string) {
-    return await this.categoryService.findOne(id);
   }
 
   @Roles(RoleTypes.ADMIN)

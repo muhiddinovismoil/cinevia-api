@@ -1,9 +1,10 @@
+import { BaseFindDto } from '@dtos';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 
-export class UpdateCategoryDto {
+export class FindAllDto extends BaseFindDto {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  name: string;
+  search: string;
 }

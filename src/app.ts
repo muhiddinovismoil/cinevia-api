@@ -14,13 +14,16 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { MulterModule } from '@nestjs/platform-express';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AuthGuard } from 'common/guards/auth.guard';
 import { appConfig, databaseConfig, jwtConfig, mailerConfig } from 'config';
 import { PrismaModule } from 'prisma';
+import { CronService } from 'services/cron.service';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       load: [appConfig, databaseConfig, jwtConfig, mailerConfig],
       isGlobal: true,
@@ -73,6 +76,7 @@ import { PrismaModule } from 'prisma';
     FileModule,
   ],
   providers: [
+    CronService,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

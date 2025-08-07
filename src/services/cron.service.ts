@@ -11,7 +11,7 @@ export class CronService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async cleanUnusedUploads() {
     try {
       const [movies, episodes, users] = await Promise.all([

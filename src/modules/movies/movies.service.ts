@@ -1,3 +1,4 @@
+import { SearchDto } from '@dtos';
 import {
   ConflictException,
   HttpStatus,
@@ -5,12 +6,17 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '@prisma';
+import { MovieTypes, Prisma } from '@prisma/client';
 import { ServiceExceptions, slugify } from '@utils';
 
 import {
   CreateEpisodeDto,
   CreateMovieDto,
   CreateSeasonDto,
+  FetchMovieDto,
+  UpdateEpisodeDto,
+  UpdateMovieDto,
+  UpdateSeasonDto,
 } from './dto/request';
 
 @Injectable()
@@ -84,59 +90,180 @@ export class MovieService {
     }
   }
 
-  async findAll() {
+  async findAll(query: FetchMovieDto) {
     try {
+      const skip = (query.pageNumber - 1) * query.pageSize;
+      const take = query.pageSize;
+      const where: Prisma.MovieWhereInput = {
+        country: !query.country ? undefined : query.country,
+        type: !query.movieType ? undefined : query.movieType,
+        category: !query.category ? undefined : { name: query.category },
+        title: !query.search
+          ? undefined
+          : {
+              contains: query.search,
+              mode: 'insensitive',
+            },
+      };
+      const [movies, total] = await Promise.all([
+        await this.prisma.movie.findMany({ skip, take, where }),
+        await this.prisma.movie.count({ where }),
+      ]);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Movie successfully fetched',
+        data: movies,
+        meta: {
+          total,
+          pageNumber: query.pageNumber,
+          pageSize: query.pageSize,
+          totalPages: Math.ceil(total / query.pageSize),
+        },
+      };
     } catch (error) {
       ServiceExceptions.handle(error, MovieService.name, 'findAll');
     }
   }
 
-  async findOne() {
+  async getMovies(search: string) {
     try {
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Movies fetched successfully',
+        data:
+          (await this.prisma.movie.findMany({
+            where: {
+              type: MovieTypes.SERIES,
+              title: { contains: search, mode: 'insensitive' },
+            },
+            select: { id: true, title: true },
+          })) ?? [],
+      };
+    } catch (error) {
+      ServiceExceptions.handle(error, MovieService.name, 'findAll');
+    }
+  }
+
+  async findOne(id: string) {
+    try {
+      const data = await this.chechExists(id);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Movie data fetched successfully',
+        data: data,
+      };
     } catch (error) {
       ServiceExceptions.handle(error, MovieService.name, 'findOne');
     }
   }
 
-  async update() {
+  async update(movieId: string, payload: UpdateMovieDto) {
     try {
+      const data = await this.chechExists(movieId);
+      await this.prisma.movie.update({
+        where: { id: movieId },
+        data: { ...payload },
+      });
+      return {
+        message: 'Movie updated successfully',
+        statusCode: HttpStatus.NO_CONTENT,
+      };
     } catch (error) {
       ServiceExceptions.handle(error, MovieService.name, 'update');
     }
   }
 
-  async updateEpisode() {
+  async updateEpisode(episodeId: string, payload: UpdateEpisodeDto) {
     try {
+      const episodeExists = await this.prisma.episode.findFirst({
+        where: { id: episodeId },
+      });
+      if (!episodeExists) throw new NotFoundException('Episode not found');
+      await this.prisma.episode.update({
+        where: { id: episodeId },
+        data: { ...payload },
+      });
+      return {
+        message: 'Episode updated successfully',
+        statusCode: HttpStatus.NO_CONTENT,
+      };
     } catch (error) {
       ServiceExceptions.handle(error, MovieService.name, 'updateEpisode');
     }
   }
 
-  async updateSeason() {
+  async updateSeason(seasonId: string, payload: UpdateSeasonDto) {
     try {
+      const seasonExists = await this.prisma.season.findFirst({
+        where: {
+          id: seasonId,
+          movieId: payload.movieId,
+        },
+      });
+      if (!seasonExists) throw new NotFoundException('Season not found');
+      await this.prisma.season.update({
+        where: { id: seasonId },
+        data: { ...payload },
+      });
+      return {
+        message: 'Season updated successfully',
+        statusCode: HttpStatus.NO_CONTENT,
+      };
     } catch (error) {
       ServiceExceptions.handle(error, MovieService.name, 'updateSeason');
     }
   }
 
-  async delete() {
+  async delete(id: string) {
     try {
+      const data = await this.chechExists(id);
+      await this.prisma.movie.delete({ where: { id } });
+      return {
+        statusCode: HttpStatus.NO_CONTENT,
+        message: 'Movie deleted successfully',
+      };
     } catch (error) {
       ServiceExceptions.handle(error, MovieService.name, 'delete');
     }
   }
 
-  async deleteEpisode() {
+  async deleteEpisode(episodeId: string) {
     try {
+      const episodeExists = await this.prisma.episode.findFirst({
+        where: { id: episodeId },
+      });
+      if (!episodeExists) throw new NotFoundException();
+      await this.prisma.episode.delete({ where: { id: episodeId } });
+      return {
+        statusCode: HttpStatus.NO_CONTENT,
+        message: 'Episode deleted successfully',
+      };
     } catch (error) {
       ServiceExceptions.handle(error, MovieService.name, 'deleteEpisode');
     }
   }
 
-  async deleteSeason() {
+  async deleteSeason(movieId: string, seasonId: string) {
     try {
+      const seasonExists = await this.prisma.season.findFirst({
+        where: { id: seasonId, movieId },
+      });
+      if (!seasonExists) throw new NotFoundException('Season not found');
+      await this.prisma.season.delete({
+        where: { id: seasonId, movieId: movieId },
+      });
+      return {
+        statusCode: HttpStatus.NO_CONTENT,
+        message: 'Season deleted successfully',
+      };
     } catch (error) {
       ServiceExceptions.handle(error, MovieService.name, 'deleteSeason');
     }
+  }
+
+  private async chechExists(id: string) {
+    const data = await this.prisma.movie.findFirst({ where: { id } });
+    if (!data) throw new NotFoundException();
+    return data;
   }
 }

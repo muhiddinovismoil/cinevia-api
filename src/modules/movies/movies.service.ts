@@ -94,7 +94,6 @@ export class MovieService {
   async findAll(query: FetchMovieDto) {
     try {
       const skip = (query.pageNumber - 1) * query.pageSize;
-      console.log(query.categoryId);
       const take = query.pageSize;
       const where: Prisma.MovieWhereInput = {
         type: !query.movieType ? undefined : query.movieType,
@@ -111,7 +110,6 @@ export class MovieService {
         await this.prisma.movie.findMany({ skip, take, where, orderBy }),
         await this.prisma.movie.count({ where }),
       ]);
-      console.log(movies);
       return {
         statusCode: HttpStatus.OK,
         message: 'Movie successfully fetched',

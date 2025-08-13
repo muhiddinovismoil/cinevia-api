@@ -121,6 +121,24 @@ export class MovieController {
   getMovies(@Query() query: SearchDto) {
     return this.movieService.getMovies(query.search);
   }
+  @HttpCode(HttpStatus.OK)
+  @ApiSuccessResponse(GetMovieTitleIdResponseDto)
+  @ApiForbiddenResponse({
+    type: ForbiddenExceptionDto,
+    description: 'Forbidden',
+  })
+  @ApiUnprocessableEntityResponse({
+    type: UnprocessableEntityExceptionDto,
+    description: 'Unprocessable entity',
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerErrorExceptionDto,
+    description: 'Internal server error',
+  })
+  @Get('/season/:movieId')
+  getSeasons(@Param('movieId', ParseUUIDPipe) movieId: string) {
+    return this.movieService.getMovies(movieId);
+  }
 
   @HttpCode(HttpStatus.OK)
   // @ApiSuccessResponse({})

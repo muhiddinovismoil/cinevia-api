@@ -1,4 +1,5 @@
 import { BaseFindDto } from '@dtos';
+import { SortEnum } from '@enums';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { MovieTypes } from '@prisma/client';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
@@ -7,20 +8,20 @@ export class FetchMovieDto extends BaseFindDto {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  search: string;
+  search?: string;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  category: string;
+  categoryId?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsEnum(MovieTypes)
-  movieType: MovieTypes;
+  movieType?: MovieTypes;
 
   @ApiPropertyOptional()
-  @IsString()
+  @IsEnum(SortEnum)
   @IsOptional()
-  country: string;
+  sort?: SortEnum;
 }

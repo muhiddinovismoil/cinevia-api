@@ -1,4 +1,5 @@
 import { SearchDto } from '@dtos';
+import { SortEnum } from '@enums';
 import {
   ConflictException,
   HttpStatus,
@@ -93,11 +94,11 @@ export class MovieService {
   async findAll(query: FetchMovieDto) {
     try {
       const skip = (query.pageNumber - 1) * query.pageSize;
+      console.log(query.categoryId);
       const take = query.pageSize;
       const where: Prisma.MovieWhereInput = {
-        country: !query.country ? undefined : query.country,
         type: !query.movieType ? undefined : query.movieType,
-        category: !query.category ? undefined : { name: query.category },
+        categoryId: !query.categoryId ? undefined : query.categoryId,
         title: !query.search
           ? undefined
           : {
@@ -105,14 +106,16 @@ export class MovieService {
               mode: 'insensitive',
             },
       };
+      const orderBy = this.setOrder(query.sort);
       const [movies, total] = await Promise.all([
-        await this.prisma.movie.findMany({ skip, take, where }),
+        await this.prisma.movie.findMany({ skip, take, where, orderBy }),
         await this.prisma.movie.count({ where }),
       ]);
+      console.log(movies);
       return {
         statusCode: HttpStatus.OK,
         message: 'Movie successfully fetched',
-        data: movies,
+        data: movies || [],
         meta: {
           total,
           pageNumber: query.pageNumber,
@@ -123,6 +126,28 @@ export class MovieService {
     } catch (error) {
       ServiceExceptions.handle(error, MovieService.name, 'findAll');
     }
+  }
+  private setOrder(
+    sort: SortEnum,
+  ): Prisma.MovieOrderByWithRelationInput | undefined {
+    let orderBy: Prisma.MovieOrderByWithRelationInput | undefined;
+    switch (sort) {
+      case SortEnum.TITLE_ASC:
+        orderBy = { title: 'asc' };
+        break;
+      case SortEnum.TITLE_DESC:
+        orderBy = { title: 'desc' };
+        break;
+      case SortEnum.DATE_ASC:
+        orderBy = { releaseYear: 'asc' };
+        break;
+      case SortEnum.DATE_DESC:
+        orderBy = { releaseYear: 'desc' };
+        break;
+      default:
+        orderBy = undefined;
+    }
+    return orderBy;
   }
 
   async getMovies(search: string) {
@@ -135,6 +160,24 @@ export class MovieService {
             where: {
               type: MovieTypes.SERIES,
               title: { contains: search, mode: 'insensitive' },
+            },
+            select: { id: true, title: true },
+          })) ?? [],
+      };
+    } catch (error) {
+      ServiceExceptions.handle(error, MovieService.name, 'findAll');
+    }
+  }
+
+  async getSeasons(movieId: string) {
+    try {
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Season fetched successfully',
+        data:
+          (await this.prisma.season.findMany({
+            where: {
+              movieId,
             },
             select: { id: true, title: true },
           })) ?? [],

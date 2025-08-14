@@ -1,5 +1,6 @@
 import { ApiSuccessResponse } from '@decorators';
 import {
+  BaseFindDto,
   ForbiddenExceptionDto,
   InternalServerErrorExceptionDto,
   SearchDto,
@@ -136,8 +137,11 @@ export class MovieController {
     description: 'Internal server error',
   })
   @Get('/season/:movieId')
-  getSeasons(@Param('movieId', ParseUUIDPipe) movieId: string) {
-    return this.movieService.getMovies(movieId);
+  getSeasons(
+    @Param('movieId', ParseUUIDPipe) movieId: string,
+    @Query() query: BaseFindDto,
+  ) {
+    return this.movieService.getSeasons(movieId, query);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -274,7 +278,7 @@ export class MovieController {
     type: InternalServerErrorExceptionDto,
     description: 'Internal server error',
   })
-  @Delete('/:episodeId')
+  @Delete('/episode/:episodeId')
   deleteEpisode(@Param('episodeId', ParseUUIDPipe) episodeId: string) {
     return this.movieService.deleteEpisode(episodeId);
   }
@@ -293,11 +297,8 @@ export class MovieController {
     type: InternalServerErrorExceptionDto,
     description: 'Internal server error',
   })
-  @Delete('/:seasonId')
-  deleteSeason(
-    @Param('seasonId', ParseUUIDPipe) seasonId: string,
-    @Body('movieId', ParseUUIDPipe) movieId: string,
-  ) {
-    return this.movieService.deleteSeason(movieId, seasonId);
+  @Delete('/season/:seasonId')
+  deleteSeason(@Param('seasonId', ParseUUIDPipe) seasonId: string) {
+    return this.movieService.deleteSeason(seasonId);
   }
 }

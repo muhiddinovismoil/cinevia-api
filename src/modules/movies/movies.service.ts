@@ -1,4 +1,4 @@
-import { SearchDto } from '@dtos';
+import { BaseFindDto, SearchDto } from '@dtos';
 import { SortEnum } from '@enums';
 import {
   ConflictException,
@@ -167,18 +167,31 @@ export class MovieService {
     }
   }
 
-  async getSeasons(movieId: string) {
+  async getSeasons(movieId: string, query: BaseFindDto) {
     try {
+      const skip = (query.pageNumber - 1) * query.pageSize;
+      const take = query.pageSize;
+      const [seasons, total] = await Promise.all([
+        await this.prisma.season.findMany({
+          where: { movieId },
+          skip,
+          take,
+          orderBy: {
+            number: 'asc',
+          },
+        }),
+        await this.prisma.season.count({ where: { movieId } }),
+      ]);
       return {
         statusCode: HttpStatus.OK,
         message: 'Season fetched successfully',
-        data:
-          (await this.prisma.season.findMany({
-            where: {
-              movieId,
-            },
-            select: { id: true, title: true },
-          })) ?? [],
+        data: seasons ?? [],
+        meta: {
+          total,
+          pageNumber: query.pageNumber,
+          pageSize: query.pageSize,
+          totalPages: Math.ceil(total / query.pageSize),
+        },
       };
     } catch (error) {
       ServiceExceptions.handle(error, MovieService.name, 'findAll');
@@ -284,14 +297,14 @@ export class MovieService {
     }
   }
 
-  async deleteSeason(movieId: string, seasonId: string) {
+  async deleteSeason(seasonId: string) {
     try {
       const seasonExists = await this.prisma.season.findFirst({
-        where: { id: seasonId, movieId },
+        where: { id: seasonId },
       });
       if (!seasonExists) throw new NotFoundException('Season not found');
       await this.prisma.season.delete({
-        where: { id: seasonId, movieId: movieId },
+        where: { id: seasonId },
       });
       return {
         statusCode: HttpStatus.NO_CONTENT,
@@ -303,7 +316,12 @@ export class MovieService {
   }
 
   private async chechExists(id: string) {
-    const data = await this.prisma.movie.findFirst({ where: { id } });
+    const data = await this.prisma.movie.findFirst({
+      where: { id },
+      include: {
+        seasons: true,
+      },
+    });
     if (!data) throw new NotFoundException();
     return data;
   }

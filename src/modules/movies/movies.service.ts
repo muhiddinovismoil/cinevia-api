@@ -197,6 +197,36 @@ export class MovieService {
       ServiceExceptions.handle(error, MovieService.name, 'findAll');
     }
   }
+  async getEpisodes(seasonId: string, query: BaseFindDto) {
+    try {
+      const skip = (query.pageNumber - 1) * query.pageSize;
+      const take = query.pageSize;
+      const [episodes, total] = await Promise.all([
+        await this.prisma.episode.findMany({
+          where: { seasonId },
+          skip,
+          take,
+          orderBy: {
+            number: 'asc',
+          },
+        }),
+        await this.prisma.episode.count({ where: { seasonId } }),
+      ]);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Episode fetched successfully',
+        data: episodes ?? [],
+        meta: {
+          total,
+          pageNumber: query.pageNumber,
+          pageSize: query.pageSize,
+          totalPages: Math.ceil(total / query.pageSize),
+        },
+      };
+    } catch (error) {
+      ServiceExceptions.handle(error, MovieService.name, 'findAll');
+    }
+  }
 
   async findOne(id: string) {
     try {

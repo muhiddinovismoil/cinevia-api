@@ -145,6 +145,27 @@ export class MovieController {
   }
 
   @HttpCode(HttpStatus.OK)
+  @ApiForbiddenResponse({
+    type: ForbiddenExceptionDto,
+    description: 'Forbidden',
+  })
+  @ApiUnprocessableEntityResponse({
+    type: UnprocessableEntityExceptionDto,
+    description: 'Unprocessable entity',
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerErrorExceptionDto,
+    description: 'Internal server error',
+  })
+  @Get('/episode/:seasonId')
+  getEpisodes(
+    @Param('seasonId', ParseUUIDPipe) seasonId: string,
+    @Query() query: BaseFindDto,
+  ) {
+    return this.movieService.getEpisodes(seasonId, query);
+  }
+
+  @HttpCode(HttpStatus.OK)
   // @ApiSuccessResponse({})
   @ApiForbiddenResponse({
     type: ForbiddenExceptionDto,
@@ -215,7 +236,7 @@ export class MovieController {
     type: InternalServerErrorExceptionDto,
     description: 'Internal server error',
   })
-  @Patch('/:episodeId')
+  @Patch('/episode/:episodeId')
   updateEpisode(
     @Param('episodeId', ParseUUIDPipe) episodeId: string,
     @Body() payload: UpdateEpisodeDto,
@@ -237,7 +258,7 @@ export class MovieController {
     type: InternalServerErrorExceptionDto,
     description: 'Internal server error',
   })
-  @Patch('/:seasonId')
+  @Patch('/season/:seasonId')
   updateSeason(
     @Param('seasonId') seasonId: string,
     @Body() payload: UpdateSeasonDto,

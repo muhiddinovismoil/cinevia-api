@@ -1,9 +1,11 @@
-import { CurrentUser } from '@decorators';
-import { Controller, Get } from '@nestjs/common';
-import { ICurrentUser } from '@type';
+import { Controller, Get, Query } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { AdminService } from './admin.service';
+import { FindAllUsersDto } from './dto/request';
 
+@ApiTags('Admin')
+@ApiBearerAuth()
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
@@ -11,5 +13,10 @@ export class AdminController {
   @Get('/statistics')
   async getStatistics() {
     return await this.adminService.statistics();
+  }
+
+  @Get('/users')
+  async getPlatformUsers(@Query() query: FindAllUsersDto) {
+    return this.adminService.getAllUsers(query);
   }
 }

@@ -37,7 +37,6 @@ export class AuthService {
   async create(payload: SignUpUserDto) {
     try {
       const user = await this.userService.findOneByCredentials(payload.email);
-
       if (user)
         throw new ConflictException('User with this email already exists');
       const hashedPass = await hashPass(payload.password);

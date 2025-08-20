@@ -218,7 +218,10 @@ export class MovieController {
     description: 'Internal server error',
   })
   @Patch('/:id')
-  update(@Param('id', ParseUUIDPipe) id: string, payload: UpdateMovieDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() payload: UpdateMovieDto,
+  ) {
     return this.movieService.update(id, payload);
   }
 

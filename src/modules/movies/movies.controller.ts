@@ -1,4 +1,4 @@
-import { ApiSuccessResponse } from '@decorators';
+import { ApiSuccessResponse, Roles } from '@decorators';
 import {
   BaseFindDto,
   ForbiddenExceptionDto,
@@ -28,6 +28,7 @@ import {
   ApiTags,
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
+import { RoleTypes } from '@prisma/client';
 
 import {
   CreateEpisodeDto,
@@ -47,6 +48,7 @@ import { MovieService } from './movies.service';
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
+  @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ description: 'Movie successfully created' })
   @ApiForbiddenResponse({
@@ -66,6 +68,7 @@ export class MovieController {
     return this.movieService.createMovie(payload);
   }
 
+  @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ description: 'Episode successfully created' })
   @ApiForbiddenResponse({
@@ -85,6 +88,7 @@ export class MovieController {
     return this.movieService.createEpisode(payload);
   }
 
+  @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ description: 'Season successfully created' })
   @ApiForbiddenResponse({
@@ -104,6 +108,7 @@ export class MovieController {
     return this.movieService.createSeason(payload);
   }
 
+  @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiSuccessResponse(GetMovieTitleIdResponseDto)
   @ApiForbiddenResponse({
@@ -122,6 +127,7 @@ export class MovieController {
   getMovies(@Query() query: SearchDto) {
     return this.movieService.getMovies(query.search);
   }
+
   @HttpCode(HttpStatus.OK)
   @ApiSuccessResponse(GetMovieTitleIdResponseDto)
   @ApiForbiddenResponse({
@@ -203,6 +209,7 @@ export class MovieController {
     return this.movieService.findOne(id);
   }
 
+  @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiNoContentResponse({ description: 'Movie successfully updated' })
   @ApiForbiddenResponse({
@@ -225,6 +232,7 @@ export class MovieController {
     return this.movieService.update(id, payload);
   }
 
+  @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiNoContentResponse({ description: 'Episode successfully updated' })
   @ApiForbiddenResponse({
@@ -247,6 +255,7 @@ export class MovieController {
     return this.movieService.updateEpisode(episodeId, payload);
   }
 
+  @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiNoContentResponse({ description: 'Season successfully updated' })
   @ApiForbiddenResponse({
@@ -269,6 +278,7 @@ export class MovieController {
     return this.movieService.updateSeason(seasonId, payload);
   }
 
+  @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiNoContentResponse({ description: 'Movie successfully deleted' })
   @ApiForbiddenResponse({
@@ -288,6 +298,7 @@ export class MovieController {
     return this.movieService.delete(id);
   }
 
+  @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiNoContentResponse({ description: 'Episode successfully deleted' })
   @ApiForbiddenResponse({
@@ -307,6 +318,7 @@ export class MovieController {
     return this.movieService.deleteEpisode(episodeId);
   }
 
+  @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiNoContentResponse({ description: 'Season successfully deleted' })
   @ApiForbiddenResponse({

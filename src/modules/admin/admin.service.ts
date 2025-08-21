@@ -1,5 +1,5 @@
 import { SortEnum } from '@enums';
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@prisma';
 import { Prisma, RoleTypes } from '@prisma/client';
 import { ServiceExceptions } from '@utils';
@@ -55,6 +55,7 @@ export class AdminService {
         ]);
 
       return {
+        statusCode: HttpStatus.OK,
         message: 'Main statistics successfully finished',
         data: {
           usersCount,
@@ -103,6 +104,7 @@ export class AdminService {
             email: true,
             fullname: true,
             createdAt: true,
+            deletedAt: true,
             updatedAt: true,
           },
           skip,
@@ -126,6 +128,26 @@ export class AdminService {
       };
     } catch (error) {
       ServiceExceptions.handle(error, AdminService.name, 'getAllUsers');
+    }
+  }
+
+  async deleteUser(id: string) {
+    try {
+      const data = await this.prisma.user.findFirst({
+        where: { id, deletedAt: null },
+      });
+      if (!data)
+        throw new NotFoundException('User not found or maybe deleted already');
+      await this.prisma.user.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
+      return {
+        statusCode: HttpStatus.NO_CONTENT,
+        message: 'User deleted successfully',
+      };
+    } catch (error) {
+      ServiceExceptions.handle(error, AdminService.name, 'deleteUser');
     }
   }
 }

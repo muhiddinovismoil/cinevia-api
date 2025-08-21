@@ -16,9 +16,13 @@ export class UserService {
   async findOneByCredentials(email: string, role?: RoleTypes) {
     try {
       if (!role) {
-        return await this.prisma.user.findFirst({ where: { email } });
+        return await this.prisma.user.findFirst({
+          where: { email, deletedAt: null },
+        });
       } else {
-        return await this.prisma.user.findFirst({ where: { email, role } });
+        return await this.prisma.user.findFirst({
+          where: { email, role, deletedAt: null },
+        });
       }
     } catch (error) {
       ServiceExceptions.handle(error, UserService.name, 'findOneByCredentials');
@@ -28,8 +32,13 @@ export class UserService {
   async findOne(id: string) {
     try {
       const user = await this.prisma.user.findFirst({
-        where: { id },
-        select: { id: true, fullname: true, photo: true, email: true },
+        where: { id, deletedAt: null },
+        select: {
+          id: true,
+          fullname: true,
+          photo: true,
+          email: true,
+        },
       });
       if (!user) throw new NotFoundException('User not found');
       return user;

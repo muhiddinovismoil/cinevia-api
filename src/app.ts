@@ -4,6 +4,7 @@ import {
   AuthModule,
   CategoryModule,
   FileModule,
+  HistoryModule,
   MovieModule,
   UserModule,
 } from '@modules';
@@ -74,6 +75,7 @@ import { CronService } from 'services/cron.service';
     AdminModule,
     CategoryModule,
     FileModule,
+    HistoryModule,
   ],
   providers: [
     CronService,

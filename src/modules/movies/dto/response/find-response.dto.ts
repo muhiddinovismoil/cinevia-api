@@ -21,7 +21,7 @@ export class GetMovieTitleIdResponseDto {
 
 export class MovieResponseDto {
   @ApiProperty()
-  @IsUUID()
+  @IsUUID('4')
   id: string;
 
   @ApiProperty()
@@ -85,7 +85,7 @@ export class MovieResponseDto {
   averageRating: number;
 
   @ApiProperty()
-  @IsUUID()
+  @IsUUID('4')
   categoryId: string;
 
   @ApiProperty()

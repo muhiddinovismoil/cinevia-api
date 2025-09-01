@@ -1,11 +1,10 @@
+import { AppConfigOptions, getLocalIP } from '@config';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { AppConfigOptions } from 'config/app.config';
 import * as express from 'express';
 import * as basicAuth from 'express-basic-auth';
-import helmet from 'helmet';
 import { join } from 'path';
 
 import { AppModule } from './app';
@@ -58,17 +57,16 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
-      docExpansion: 'none',
     },
     customJsStr: collapsed,
   });
 
   await app.listen(process.env.PORT ?? 3000, () => {
     console.log(
-      `Server is running on http://${appConfig.host}:${appConfig.port}`,
+      `Server is running on http://${getLocalIP()}:${appConfig.port}`,
     );
     console.log(
-      `Swagger route: http://${appConfig.host}:${appConfig.port}/api/docs`,
+      `Swagger route: http://${getLocalIP()}:${appConfig.port}/api/docs`,
     );
   });
 }

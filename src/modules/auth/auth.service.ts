@@ -58,7 +58,10 @@ export class AuthService {
 
   async signin(payload: SignInDto) {
     try {
-      const user = await this.userService.findOneByCredentials(payload.email);
+      const user = await this.userService.findOneByCredentials(
+        payload.email,
+        RoleTypes.USER,
+      );
 
       if (!user) throw new ForbiddenException();
 

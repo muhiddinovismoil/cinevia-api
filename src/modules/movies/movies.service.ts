@@ -244,9 +244,10 @@ export class MovieService {
   async update(movieId: string, payload: UpdateMovieDto) {
     try {
       const data = await this.chechExists(movieId);
+      const slug = slugify(payload.title);
       await this.prisma.movie.update({
         where: { id: movieId },
-        data: { ...payload },
+        data: { ...payload, slug },
       });
       return {
         message: 'Movie updated successfully',

@@ -20,7 +20,7 @@ import { FileService } from './file.service';
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
-  @Roles(RoleTypes.ADMIN)
+  @Roles(RoleTypes.ADMIN, RoleTypes.USER)
   @ApiSuccessResponse(FileUploadResponse)
   @ApiConsumes('multipart/form-data')
   @ApiBody(FileUploadBody)

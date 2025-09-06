@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { MovieTypes, UploadTypes } from '@prisma/client';
 import {
   IsDate,
@@ -8,6 +8,7 @@ import {
   IsUUID,
   IsUrl,
 } from 'class-validator';
+import { GetCategoryByIdResponseDto } from 'modules/categories/dto/response';
 
 export class GetMovieTitleIdResponseDto {
   @ApiProperty()
@@ -95,4 +96,18 @@ export class MovieResponseDto {
   @ApiProperty()
   @IsDate()
   updatedAt: Date;
+
+  @ApiPropertyOptional()
+  category: GetCategoryByIdResponseDto;
+}
+
+export class MainMoviesTvSeriesCartoonsResponseDto {
+  @ApiPropertyOptional({ isArray: true })
+  movies: MovieResponseDto;
+
+  @ApiPropertyOptional({ isArray: true })
+  cartoons: MovieResponseDto;
+
+  @ApiPropertyOptional({ isArray: true })
+  tvseries: MovieResponseDto;
 }

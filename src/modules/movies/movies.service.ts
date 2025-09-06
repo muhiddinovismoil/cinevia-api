@@ -15,6 +15,7 @@ import {
   CreateMovieDto,
   CreateSeasonDto,
   FetchMovieDto,
+  FindRecommendedsDto,
   UpdateEpisodeDto,
   UpdateMovieDto,
   UpdateSeasonDto,
@@ -52,17 +53,32 @@ export class MovieService {
   async createEpisode(payload: CreateEpisodeDto) {
     try {
       const seasonExists = await this.prisma.season.findFirst({
-        where: { id: payload.seasonId },
+        where: {
+          id: payload.seasonId,
+          movie: {
+            type: { in: ['SERIES', 'CARTOON_SERIES'] },
+          },
+        },
       });
-      if (!seasonExists) throw new NotFoundException('Season does not exists');
-      const data = await this.prisma.episode.findFirst({
+
+      if (!seasonExists) {
+        throw new NotFoundException(
+          'Season does not exist or movie type is not series/cartoon series',
+        );
+      }
+
+      const episodeExists = await this.prisma.episode.findFirst({
         where: { number: payload.number, seasonId: payload.seasonId },
       });
-      if (data)
+
+      if (episodeExists) {
         throw new ConflictException(
-          'Episode number already exists on this season',
+          'Episode number already exists in this season',
         );
+      }
+
       await this.prisma.episode.create({ data: { ...payload } });
+
       return {
         statusCode: HttpStatus.OK,
         message: 'Episode successfully created',
@@ -74,14 +90,31 @@ export class MovieService {
 
   async createSeason(payload: CreateSeasonDto) {
     try {
+      const movie = await this.prisma.movie.findFirst({
+        where: {
+          id: payload.movieId,
+          type: { in: ['SERIES', 'CARTOON_SERIES'] },
+        },
+      });
+
+      if (!movie) {
+        throw new NotFoundException(
+          'Movie does not exist or is not a series/cartoon series',
+        );
+      }
+
       const seasonExists = await this.prisma.season.findFirst({
         where: { movieId: payload.movieId, number: payload.number },
       });
-      if (seasonExists)
+
+      if (seasonExists) {
         throw new ConflictException(
           'Season already exists with this number on movie',
         );
+      }
+
       await this.prisma.season.create({ data: { ...payload } });
+
       return {
         statusCode: HttpStatus.OK,
         message: 'Season successfully created',
@@ -96,15 +129,20 @@ export class MovieService {
       const skip = (query.pageNumber - 1) * query.pageSize;
       const take = query.pageSize;
       const where: Prisma.MovieWhereInput = {
-        type: !query.movieType ? undefined : query.movieType,
-        categoryId: !query.categoryId ? undefined : query.categoryId,
-        title: !query.search
+        categoryId: query.categoryId || undefined,
+        title: query.search
+          ? { contains: query.search, mode: 'insensitive' }
+          : undefined,
+        OR: !query.movieType
           ? undefined
-          : {
-              contains: query.search,
-              mode: 'insensitive',
-            },
+          : query.movieType === MovieTypes.CARTOON
+            ? [
+                { type: MovieTypes.CARTOON },
+                { type: MovieTypes.CARTOON_SERIES },
+              ]
+            : [{ type: query.movieType }],
       };
+
       const orderBy = this.setOrder(query.sort);
       const [movies, total] = await Promise.all([
         await this.prisma.movie.findMany({ skip, take, where, orderBy }),
@@ -225,6 +263,81 @@ export class MovieService {
       };
     } catch (error) {
       ServiceExceptions.handle(error, MovieService.name, 'findAll');
+    }
+  }
+
+  async getMainMoviesTvSeriesCartoons() {
+    try {
+      const [movies, cartoons, tvseries] = await Promise.all([
+        this.prisma.movie.findMany({
+          where: { type: MovieTypes.MOVIE, imdbRating: { gte: 6 } },
+          include: { category: true },
+          take: 16,
+        }),
+        this.prisma.movie.findMany({
+          where: {
+            type: { in: [MovieTypes.CARTOON, MovieTypes.CARTOON_SERIES] },
+            imdbRating: { gte: 6 },
+          },
+          include: { category: true },
+          take: 16,
+        }),
+        this.prisma.movie.findMany({
+          where: { type: MovieTypes.SERIES, imdbRating: { gte: 6 } },
+          include: { category: true },
+          take: 16,
+        }),
+      ]);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Main movies cartoons tvseries fetched successfully',
+        data: {
+          movies: movies ?? [],
+          cartoons: cartoons ?? [],
+          tvseries: tvseries ?? [],
+        },
+      };
+    } catch (error) {
+      ServiceExceptions.handle(
+        error,
+        MovieService.name,
+        'getMainMoviesTvSeriesCartoons',
+      );
+    }
+  }
+
+  async getRecomendeds({
+    categoryId,
+    imdbRating,
+    movieType,
+    movieId,
+  }: FindRecommendedsDto) {
+    try {
+      if (typeof imdbRating === 'number' && !isNaN(imdbRating)) {
+        const data = await this.prisma.movie.findMany({
+          where: {
+            id: {
+              not: {
+                equals: movieId,
+              },
+            },
+            categoryId,
+            imdbRating: {
+              gte: imdbRating - 1,
+              lte: imdbRating,
+            },
+            type: movieType,
+          },
+          take: 16,
+        });
+        return {
+          statusCode: HttpStatus.OK,
+          message: `Recommended ${movieType[0].toUpperCase() + movieType.slice(1).toLowerCase()}`,
+          data: data ?? [],
+        };
+      }
+    } catch (error) {
+      ServiceExceptions.handle(error, MovieService.name, 'getRecomendeds');
     }
   }
 

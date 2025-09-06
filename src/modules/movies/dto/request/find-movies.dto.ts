@@ -2,7 +2,8 @@ import { BaseFindDto } from '@dtos';
 import { SortEnum } from '@enums';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { MovieTypes } from '@prisma/client';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class FetchMovieDto extends BaseFindDto {
   @ApiPropertyOptional()
@@ -16,7 +17,7 @@ export class FetchMovieDto extends BaseFindDto {
   categoryId?: string;
 
   @ApiPropertyOptional({
-    enum: MovieTypes,
+    enum: [MovieTypes.MOVIE, MovieTypes.SERIES, MovieTypes.CARTOON],
   })
   @IsOptional()
   @IsEnum(MovieTypes)
@@ -26,4 +27,33 @@ export class FetchMovieDto extends BaseFindDto {
   @IsEnum(SortEnum)
   @IsOptional()
   sort?: SortEnum;
+}
+
+export class FindRecommendedsDto {
+  @ApiPropertyOptional({
+    description: 'IMDB rating (float)',
+    example: 8.8,
+    type: Number,
+  })
+  @IsOptional()
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Type(() => Number)
+  imdbRating?: number;
+
+  @ApiPropertyOptional({
+    enum: MovieTypes,
+  })
+  @IsOptional()
+  @IsEnum(MovieTypes)
+  movieType?: MovieTypes;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  categoryId?: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  movieId?: string;
 }

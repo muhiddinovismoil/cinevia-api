@@ -1,4 +1,4 @@
-import { ApiSuccessResponse, Roles } from '@decorators';
+import { ApiSuccessResponse, Public, Roles } from '@decorators';
 import {
   BaseFindDto,
   ForbiddenExceptionDto,
@@ -35,19 +35,24 @@ import {
   CreateMovieDto,
   CreateSeasonDto,
   FetchMovieDto,
+  FindRecommendedsDto,
   UpdateEpisodeDto,
   UpdateMovieDto,
   UpdateSeasonDto,
 } from './dto/request';
-import { GetMovieTitleIdResponseDto } from './dto/response';
+import {
+  GetMovieTitleIdResponseDto,
+  MainMoviesTvSeriesCartoonsResponseDto,
+  MovieResponseDto,
+} from './dto/response';
 import { MovieService } from './movies.service';
 
-@ApiBearerAuth()
 @ApiTags('Movies')
 @Controller('movie')
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
+  @ApiBearerAuth()
   @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ description: 'Movie successfully created' })
@@ -68,6 +73,7 @@ export class MovieController {
     return this.movieService.createMovie(payload);
   }
 
+  @ApiBearerAuth()
   @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ description: 'Episode successfully created' })
@@ -88,6 +94,7 @@ export class MovieController {
     return this.movieService.createEpisode(payload);
   }
 
+  @ApiBearerAuth()
   @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ description: 'Season successfully created' })
@@ -108,6 +115,7 @@ export class MovieController {
     return this.movieService.createSeason(payload);
   }
 
+  @ApiBearerAuth()
   @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiSuccessResponse(GetMovieTitleIdResponseDto)
@@ -126,6 +134,46 @@ export class MovieController {
   @Get('/data')
   getMovies(@Query() query: SearchDto) {
     return this.movieService.getMovies(query.search);
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiSuccessResponse(MovieResponseDto, true)
+  @ApiForbiddenResponse({
+    type: ForbiddenExceptionDto,
+    description: 'Forbidden',
+  })
+  @ApiUnprocessableEntityResponse({
+    type: UnprocessableEntityExceptionDto,
+    description: 'Unprocessable entity',
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerErrorExceptionDto,
+    description: 'Internal server error',
+  })
+  @Get('/recommendeds')
+  getRecommendends(@Query() query: FindRecommendedsDto) {
+    return this.movieService.getRecomendeds(query);
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiSuccessResponse(MainMoviesTvSeriesCartoonsResponseDto)
+  @ApiForbiddenResponse({
+    type: ForbiddenExceptionDto,
+    description: 'Forbidden',
+  })
+  @ApiUnprocessableEntityResponse({
+    type: UnprocessableEntityExceptionDto,
+    description: 'Unprocessable entity',
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerErrorExceptionDto,
+    description: 'Internal server error',
+  })
+  @Get('/main')
+  getMoviesTvSeriesCartoons() {
+    return this.movieService.getMainMoviesTvSeriesCartoons();
   }
 
   @HttpCode(HttpStatus.OK)
@@ -172,7 +220,7 @@ export class MovieController {
   }
 
   @HttpCode(HttpStatus.OK)
-  // @ApiSuccessResponse({})
+  @ApiSuccessResponse(MovieResponseDto, true)
   @ApiForbiddenResponse({
     type: ForbiddenExceptionDto,
     description: 'Forbidden',
@@ -190,8 +238,9 @@ export class MovieController {
     return this.movieService.findAll(query);
   }
 
+  @Public()
   @HttpCode(HttpStatus.OK)
-  // @ApiSuccessResponse({})
+  @ApiSuccessResponse(MovieResponseDto)
   @ApiForbiddenResponse({
     type: ForbiddenExceptionDto,
     description: 'Forbidden',
@@ -209,6 +258,7 @@ export class MovieController {
     return this.movieService.findOne(id);
   }
 
+  @ApiBearerAuth()
   @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiNoContentResponse({ description: 'Movie successfully updated' })
@@ -232,6 +282,7 @@ export class MovieController {
     return this.movieService.update(id, payload);
   }
 
+  @ApiBearerAuth()
   @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiNoContentResponse({ description: 'Episode successfully updated' })
@@ -255,6 +306,7 @@ export class MovieController {
     return this.movieService.updateEpisode(episodeId, payload);
   }
 
+  @ApiBearerAuth()
   @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiNoContentResponse({ description: 'Season successfully updated' })
@@ -278,6 +330,7 @@ export class MovieController {
     return this.movieService.updateSeason(seasonId, payload);
   }
 
+  @ApiBearerAuth()
   @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiNoContentResponse({ description: 'Movie successfully deleted' })
@@ -298,6 +351,7 @@ export class MovieController {
     return this.movieService.delete(id);
   }
 
+  @ApiBearerAuth()
   @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiNoContentResponse({ description: 'Episode successfully deleted' })
@@ -318,6 +372,7 @@ export class MovieController {
     return this.movieService.deleteEpisode(episodeId);
   }
 
+  @ApiBearerAuth()
   @Roles(RoleTypes.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiNoContentResponse({ description: 'Season successfully deleted' })

@@ -24,6 +24,7 @@ enum MovieTypes {
   MOVIE
   SERIES
   CARTOON
+  CARTOON_SERIES
 
   @@map("movie_types")
 }

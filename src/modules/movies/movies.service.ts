@@ -1,4 +1,4 @@
-import { BaseFindDto, SearchDto } from '@dtos';
+import { BaseFindDto } from '@dtos';
 import { SortEnum } from '@enums';
 import {
   ConflictException,
@@ -9,6 +9,9 @@ import {
 import { PrismaService } from '@prisma';
 import { MovieTypes, Prisma } from '@prisma/client';
 import { ServiceExceptions, slugify } from '@utils';
+import { Request, Response } from 'express';
+import * as fs from 'fs';
+import { join } from 'path';
 
 import {
   CreateEpisodeDto,
@@ -354,6 +357,46 @@ export class MovieService {
     }
   }
 
+  async streamMedia(filename: string, req: Request, res: Response) {
+    try {
+      const filePath = join(__dirname, '..', '..', '..', '/uploads', filename);
+
+      if (!fs.existsSync(filePath)) {
+        throw new NotFoundException('Media not found');
+      }
+
+      const stat = fs.statSync(filePath);
+      const fileSize = stat.size;
+      const range = req.headers.range;
+
+      if (range) {
+        const parts = range.replace(/bytes=/, '').split('-');
+        const start = parseInt(parts[0], 10);
+        const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+
+        const chunkSize = end - start + 1;
+        const file = fs.createReadStream(filePath, { start, end });
+
+        res.writeHead(206, {
+          'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+          'Accept-Ranges': `bytes`,
+          'Content-Length': chunkSize,
+          'Content-Type': 'video/mp4',
+        });
+
+        file.pipe(res);
+      } else {
+        res.writeHead(200, {
+          'Content-Length': fileSize,
+          'Content-Type': 'video/mp4',
+        });
+        fs.createReadStream(filePath).pipe(res);
+      }
+    } catch (error) {
+      ServiceExceptions.handle(error, MovieService.name, 'streamMedia');
+    }
+  }
+
   async update(movieId: string, payload: UpdateMovieDto) {
     try {
       const data = await this.chechExists(movieId);
@@ -463,9 +506,17 @@ export class MovieService {
     const data = await this.prisma.movie.findFirst({
       where: { id },
       include: {
-        seasons: true,
+        seasons: {
+          orderBy: { title: 'asc' },
+          include: {
+            episodes: {
+              orderBy: { title: 'asc' },
+            },
+          },
+        },
       },
     });
+
     if (!data) throw new NotFoundException();
     return data;
   }

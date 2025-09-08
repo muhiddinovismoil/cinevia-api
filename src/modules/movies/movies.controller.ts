@@ -18,17 +18,22 @@ import {
   Patch,
   Post,
   Query,
+  Req,
+  Res,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
+  ApiProduces,
   ApiTags,
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { RoleTypes } from '@prisma/client';
+import { Request, Response } from 'express';
 
 import {
   CreateEpisodeDto,
@@ -217,6 +222,33 @@ export class MovieController {
     @Query() query: BaseFindDto,
   ) {
     return this.movieService.getEpisodes(seasonId, query);
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Stream video file',
+    schema: {
+      type: 'string',
+      format: 'binary',
+    },
+  })
+  @ApiProduces('video/mp4')
+  @ApiNotFoundResponse({
+    description: 'Media not found',
+    schema: {},
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerErrorExceptionDto,
+    description: 'Internal server error',
+  })
+  @Get('/stream/:filename')
+  streamMedia(
+    @Param('filename') filename: string,
+    @Res() res: Response,
+    @Req() req: Request,
+  ) {
+    return this.movieService.streamMedia(filename, req, res);
   }
 
   @HttpCode(HttpStatus.OK)

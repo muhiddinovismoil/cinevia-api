@@ -23,6 +23,22 @@ export class FetchMovieDto extends BaseFindDto {
   @IsEnum(MovieTypes)
   movieType?: MovieTypes;
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  country: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  releaseYear: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Type(() => Number)
+  imdbRating: number;
+
   @ApiPropertyOptional({ enum: SortEnum })
   @IsEnum(SortEnum)
   @IsOptional()

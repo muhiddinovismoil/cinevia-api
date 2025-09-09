@@ -35,6 +35,7 @@ async function bootstrap() {
   app.enableVersioning({ defaultVersion: '1', type: VersioningType.URI });
 
   app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
+  app.use('/swagger-ui', express.static(join(__dirname, '..', 'swagger-ui')));
 
   app.use(
     '/api/docs',
@@ -58,6 +59,7 @@ async function bootstrap() {
     swaggerOptions: {
       persistAuthorization: true,
     },
+    customCssUrl: '/swagger-ui/swagger-dark.css',
     customJsStr: collapsed,
   });
 

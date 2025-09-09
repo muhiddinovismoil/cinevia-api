@@ -251,6 +251,7 @@ export class MovieController {
     return this.movieService.streamMedia(filename, req, res);
   }
 
+  @Public()
   @HttpCode(HttpStatus.OK)
   @ApiSuccessResponse(MovieResponseDto, true)
   @ApiForbiddenResponse({

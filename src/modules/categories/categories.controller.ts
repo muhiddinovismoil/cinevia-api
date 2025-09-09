@@ -1,4 +1,4 @@
-import { ApiSuccessResponse, Roles } from '@decorators';
+import { ApiSuccessResponse, Public, Roles } from '@decorators';
 import {
   ForbiddenExceptionDto,
   InternalServerErrorExceptionDto,
@@ -57,6 +57,7 @@ export class CategoryController {
     return await this.categoryService.create(payload);
   }
 
+  @Public()
   @HttpCode(HttpStatus.OK)
   @ApiSuccessResponse(GetAllCategoryResponseDto, true)
   @ApiForbiddenResponse({

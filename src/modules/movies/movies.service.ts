@@ -133,6 +133,7 @@ export class MovieService {
       const take = query.pageSize;
       const where: Prisma.MovieWhereInput = {
         categoryId: query.categoryId || undefined,
+        
         title: query.search
           ? { contains: query.search, mode: 'insensitive' }
           : undefined,

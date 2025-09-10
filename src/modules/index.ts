@@ -4,4 +4,6 @@ export * from './admin';
 export * from './categories';
 export * from './file';
 export * from './movies';
-export * from './history'
+export * from './history';
+export * from './favorite';
+export * from './rating';

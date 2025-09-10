@@ -1,11 +1,14 @@
-import { RolesGuard } from '@guards';
+import { appConfig, databaseConfig, jwtConfig, mailerConfig } from '@config';
+import { AuthGuard, RolesGuard } from '@guards';
 import {
   AdminModule,
   AuthModule,
   CategoryModule,
+  FavouriteModule,
   FileModule,
   HistoryModule,
   MovieModule,
+  RatingModule,
   UserModule,
 } from '@modules';
 import { RedisModule } from '@nestjs-modules/ioredis';
@@ -17,10 +20,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { MulterModule } from '@nestjs/platform-express';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { AuthGuard } from 'common/guards/auth.guard';
-import { appConfig, databaseConfig, jwtConfig, mailerConfig } from 'config';
-import { PrismaModule } from 'prisma';
-import { CronService } from 'services/cron.service';
+import { PrismaModule } from '@prisma';
+import { CronService } from '@services';
 
 @Module({
   imports: [
@@ -76,6 +77,8 @@ import { CronService } from 'services/cron.service';
     CategoryModule,
     FileModule,
     HistoryModule,
+    FavouriteModule,
+    RatingModule,
   ],
   providers: [
     CronService,

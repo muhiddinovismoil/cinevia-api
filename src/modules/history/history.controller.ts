@@ -1,8 +1,8 @@
 import { CurrentUser } from '@decorators';
-import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Patch, Post } from '@nestjs/common';
 import { ICurrentUser } from '@type';
 
-import { CreateHistoryDto } from './dto/request';
+import { CreateHistoryDto, UpdateHistoryDto } from './dto/request';
 import { HistoryService } from './history.service';
 
 @Controller('hisory')
@@ -14,18 +14,8 @@ export class HistoryController {
     return this.historyService.create({ ...payload, userId: user.id });
   }
 
-  @Get()
-  findAll(@CurrentUser() user: ICurrentUser) {
-    return this.historyService.findAll(user.id);
-  }
-
-  @Patch('/:id')
-  update() {
-    return this.historyService.update('', {});
-  }
-
-  @Delete('/:id')
-  delete() {
-    return this.historyService.remove('');
+  @Patch('/update')
+  update(@CurrentUser() user: ICurrentUser, @Body() payload: UpdateHistoryDto) {
+    return this.historyService.update({ ...payload, userId: user.id });
   }
 }

@@ -172,3 +172,25 @@ h4 {
   fill: #000000 !important;
   stroke: #ffffff !important;
 }
+
+.modal-ux-content,
+.modal-ux-header {
+  background-color: #1a1a1a !important;
+}
+
+.auth-btn-wrapper {
+  gap: 20px !important;
+}
+
+h3,
+h6 {
+  color: white !important;
+}
+
+code {
+  color: white !important;
+}
+
+label {
+  color: white !important;
+}

@@ -1,26 +1,45 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '@prisma';
+import { ServiceExceptions } from '@utils';
 
 import { CreateRatingDto, UpdateRatingDto } from './dto/request';
 
 @Injectable()
 export class RatingService {
-  create(createRatingDto: CreateRatingDto) {
-    return 'This action adds a new ';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createRatingDto: CreateRatingDto) {
+    try {
+    } catch (error) {
+      ServiceExceptions.handle(error, RatingService.name, 'create');
+    }
   }
 
-  findAll() {
-    return `This action returns all s`;
+  async findAll() {
+    try {
+    } catch (error) {
+      ServiceExceptions.handle(error, RatingService.name, 'findAll');
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #id `;
+  async findOne(id: number) {
+    try {
+    } catch (error) {
+      ServiceExceptions.handle(error, RatingService.name, 'findOne');
+    }
   }
 
-  update(id: number, updateRatingDto: UpdateRatingDto) {
-    return `This action updates a #id `;
+  async update(id: number, updateRatingDto: UpdateRatingDto) {
+    try {
+    } catch (error) {
+      ServiceExceptions.handle(error, RatingService.name, 'update');
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #id `;
+  async remove(id: number) {
+    try {
+    } catch (error) {
+      ServiceExceptions.handle(error, RatingService.name, 'remove');
+    }
   }
 }

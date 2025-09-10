@@ -1,16 +1,24 @@
-import { Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import { CurrentUser } from '@decorators';
+import { Body, Controller, Delete, Param, Post } from '@nestjs/common';
+import { ICurrentUser } from '@type';
+
+import { CreateFavouriteDto } from './dto/request';
+import { FavouriteService } from './favorite.service';
 
 @Controller('favourite')
 export class FavouriteController {
+  constructor(private readonly favouriteService: FavouriteService) {}
+
   @Post()
-  create() {}
+  create(
+    @CurrentUser() user: ICurrentUser,
+    @Body() payload: CreateFavouriteDto,
+  ) {
+    return this.favouriteService.create(user.id, payload);
+  }
 
-  @Get()
-  findAll() {}
-
-  @Put('/:id')
-  update() {}
-
-  @Delete('/:id')
-  delete() {}
+  @Delete('/:movieId')
+  delete(@CurrentUser() user: ICurrentUser, @Param('movieId') movieId: string) {
+    return this.favouriteService.removeFromFavourite(user.id, movieId);
+  }
 }

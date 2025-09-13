@@ -30,8 +30,8 @@ export class FetchMovieDto extends BaseFindDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsNumber()
-  releaseYear: number;
+  @IsString()
+  releaseYear?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

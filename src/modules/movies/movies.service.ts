@@ -129,11 +129,17 @@ export class MovieService {
 
   async findAll(query: FetchMovieDto) {
     try {
-      const skip = (query.pageNumber - 1) * query.pageSize;
-      const take = query.pageSize;
+      const skip = query.pageNumber
+        ? (query.pageNumber - 1) * query.pageSize
+        : undefined;
+      const take = query.pageSize ? query.pageSize : undefined;
       const where: Prisma.MovieWhereInput = {
         categoryId: query.categoryId || undefined,
-        
+        releaseYear: query.releaseYear
+          ? {
+              equals: Number(query.releaseYear),
+            }
+          : undefined,
         title: query.search
           ? { contains: query.search, mode: 'insensitive' }
           : undefined,

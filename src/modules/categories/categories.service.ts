@@ -37,8 +37,8 @@ export class CategoryService {
 
   async findAll({ pageNumber, pageSize, search }: FindAllDto) {
     try {
-      const skip = (pageNumber - 1) * pageSize;
-      const take = pageSize;
+      const skip = pageNumber ? (pageNumber - 1) * pageSize : undefined;
+      const take = pageNumber ? pageSize : undefined;
       const [data, total] = await this.prisma.$transaction([
         this.prisma.category.findMany({
           skip,

@@ -8,11 +8,7 @@ import {
   IsUUID,
 } from 'class-validator';
 
-export class CreateHistoryDto {
-  @ApiProperty()
-  @IsUUID('4')
-  userId: string;
-
+export class UpsertHistoryDto {
   @ApiProperty()
   @IsUUID('4')
   movieId: string;
@@ -20,15 +16,15 @@ export class CreateHistoryDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsUUID('4')
-  episodeId: string;
+  episodeId?: string;
 
   @ApiProperty()
   @IsNumber()
-  watchedDuration: number;
+  duration: number;
 
   @ApiProperty()
-  @IsBoolean()
-  isCompleted: boolean;
+  @IsNumber()
+  progress: number;
 
   @ApiProperty()
   @IsEnum(WatchStatus)

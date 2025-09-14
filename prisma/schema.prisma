@@ -39,7 +39,6 @@ enum UploadTypes {
 enum WatchStatus {
   WATCHING
   COMPLETED
-  PLAN_TO_WATCH
 
   @@map("watch_status")
 }
@@ -149,13 +148,13 @@ model Episode {
 }
 
 model WatchHistory {
-  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId          String      @map("user_id") @db.Uuid
-  movieId         String      @map("movie_id") @db.Uuid
-  episodeId       String?     @map("episode_id") @db.Uuid
-  watchedDuration Int         @default(0) @map("watched_duration")
-  isCompleted     Boolean     @default(false) @map("is_completed")
-  status          WatchStatus @default(WATCHING)
+  id        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String      @map("user_id") @db.Uuid
+  movieId   String      @map("movie_id") @db.Uuid
+  episodeId String?     @map("episode_id") @db.Uuid
+  duration  Int         @default(0) @map("watched_duration")
+  progress  Int         @default(0) @map("watch_progress")
+  status    WatchStatus @default(WATCHING)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -164,6 +163,7 @@ model WatchHistory {
   movie   Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
   episode Episode? @relation(fields: [episodeId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, movieId])
   @@unique([userId, movieId, episodeId])
   @@map("watch_history")
 }

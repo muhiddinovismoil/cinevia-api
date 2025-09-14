@@ -1,2 +1,1 @@
-export * from './create-history.dto';
-export * from './update-history.dto';
+export * from './upsert-history.dto';

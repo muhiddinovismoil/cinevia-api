@@ -1,5 +1,12 @@
 import { CurrentUser } from '@decorators';
-import { Body, Controller, Delete, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  ParseUUIDPipe,
+  Post,
+} from '@nestjs/common';
 import { ICurrentUser } from '@type';
 
 import { CreateFavouriteDto } from './dto/request';
@@ -18,7 +25,10 @@ export class FavouriteController {
   }
 
   @Delete('/:movieId')
-  delete(@CurrentUser() user: ICurrentUser, @Param('movieId') movieId: string) {
+  delete(
+    @CurrentUser() user: ICurrentUser,
+    @Param('movieId', ParseUUIDPipe) movieId: string,
+  ) {
     return this.favouriteService.removeFromFavourite(user.id, movieId);
   }
 }

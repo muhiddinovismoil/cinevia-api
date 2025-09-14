@@ -19,6 +19,19 @@ export class GetMovieTitleIdResponseDto {
   @IsString()
   title: string;
 }
+export class FavouriteDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  userId: string;
+
+  @ApiProperty()
+  movieId: string;
+
+  @ApiProperty()
+  createdAt: Date;
+}
 
 export class MovieResponseDto {
   @ApiProperty()
@@ -99,6 +112,9 @@ export class MovieResponseDto {
 
   @ApiPropertyOptional()
   category: GetCategoryByIdResponseDto;
+
+  @ApiPropertyOptional()
+  favorites: FavouriteDto;
 }
 
 export class MainMoviesTvSeriesCartoonsResponseDto {

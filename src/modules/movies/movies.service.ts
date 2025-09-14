@@ -155,7 +155,13 @@ export class MovieService {
 
       const orderBy = this.setOrder(query.sort);
       const [movies, total] = await Promise.all([
-        await this.prisma.movie.findMany({ skip, take, where, orderBy }),
+        await this.prisma.movie.findMany({
+          skip,
+          take,
+          where,
+          orderBy,
+          include: { favorites: true },
+        }),
         await this.prisma.movie.count({ where }),
       ]);
       return {
@@ -207,7 +213,7 @@ export class MovieService {
               type: MovieTypes.SERIES,
               title: { contains: search, mode: 'insensitive' },
             },
-            select: { id: true, title: true },
+            select: { id: true, title: true, favorites: true },
           })) ?? [],
       };
     } catch (error) {
@@ -281,7 +287,7 @@ export class MovieService {
       const [movies, cartoons, tvseries] = await Promise.all([
         this.prisma.movie.findMany({
           where: { type: MovieTypes.MOVIE, imdbRating: { gte: 6 } },
-          include: { category: true },
+          include: { category: true, favorites: true },
           take: 16,
         }),
         this.prisma.movie.findMany({
@@ -289,12 +295,12 @@ export class MovieService {
             type: { in: [MovieTypes.CARTOON, MovieTypes.CARTOON_SERIES] },
             imdbRating: { gte: 6 },
           },
-          include: { category: true },
+          include: { category: true, favorites: true },
           take: 16,
         }),
         this.prisma.movie.findMany({
           where: { type: MovieTypes.SERIES, imdbRating: { gte: 6 } },
-          include: { category: true },
+          include: { category: true, favorites: true },
           take: 16,
         }),
       ]);
@@ -339,6 +345,7 @@ export class MovieService {
             type: movieType,
           },
           take: 16,
+          include: { favorites: true },
         });
         return {
           statusCode: HttpStatus.OK,
@@ -521,6 +528,7 @@ export class MovieService {
             },
           },
         },
+        favorites: true,
       },
     });
 

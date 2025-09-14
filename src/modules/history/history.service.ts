@@ -2,7 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '@prisma';
 import { ServiceExceptions } from '@utils';
 
-import { UpsertHistoryDto } from './dto/request';
+import { FindAllHistoryDto, UpsertHistoryDto } from './dto/request';
 
 @Injectable()
 export class HistoryService {
@@ -36,6 +36,30 @@ export class HistoryService {
       };
     } catch (error) {
       ServiceExceptions.handle(error, HistoryService.name, 'upsert');
+    }
+  }
+
+  async findAll(userId: string, query?: FindAllHistoryDto) {
+    try {
+      const skip = query.pageNumber
+        ? (query.pageNumber - 1) * query.pageSize
+        : undefined;
+      const take = query.pageNumber ? query.pageSize : undefined;
+      const data = await this.prisma.watchHistory.findMany({
+        where: { userId },
+        include: {
+          movie: true,
+        },
+        take,
+        skip,
+      });
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Watch history fetched successfully',
+        data: data ?? [],
+      };
+    } catch (error) {
+      ServiceExceptions.handle(error, HistoryService.name, 'findAll');
     }
   }
 }

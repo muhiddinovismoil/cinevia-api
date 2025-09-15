@@ -11,11 +11,11 @@ export class RatingController {
 
   @Post()
   create(@CurrentUser() user: ICurrentUser, @Body() payload: CreateRatingDto) {
-    return this.ratingService.create({ ...payload, userId: user.id });
+    return this.ratingService.create(user.id, { ...payload });
   }
 
   @Patch('/update')
   update(@CurrentUser() user: ICurrentUser, @Body() payload: UpdateRatingDto) {
-    return this.ratingService.update({ ...payload, userId: user.id });
+    return this.ratingService.update(user.id, { ...payload });
   }
 }

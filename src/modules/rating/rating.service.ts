@@ -8,7 +8,7 @@ import { CreateRatingDto, UpdateRatingDto } from './dto/request';
 export class RatingService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create({ movieId, userId, ...payload }: CreateRatingDto) {
+  async create(userId: string, { movieId, ...payload }: CreateRatingDto) {
     try {
       const data = await this.prisma.rating.findFirst({
         where: { userId, movieId },
@@ -27,7 +27,7 @@ export class RatingService {
     }
   }
 
-  async update({ userId, movieId, ...payload }: UpdateRatingDto) {
+  async update(userId: string, { movieId, ...payload }: UpdateRatingDto) {
     try {
       const data = await this.prisma.rating.findUnique({
         where: { userId_movieId: { userId, movieId } },

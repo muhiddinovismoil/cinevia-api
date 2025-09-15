@@ -7,7 +7,7 @@ import {
 import { PrismaService } from '@prisma';
 import { ServiceExceptions } from '@utils';
 
-import { CreateFavouriteDto } from './dto/request';
+import { CreateFavouriteDto, FindAllQueryDto } from './dto/request';
 
 @Injectable()
 export class FavouriteService {
@@ -56,6 +56,34 @@ export class FavouriteService {
         error,
         FavouriteService.name,
         'removeFromFavourite',
+      );
+    }
+  }
+
+  async findAllFavourites(userId: string, query: FindAllQueryDto) {
+    try {
+      const skip = query.pageNumber
+        ? (query.pageNumber - 1) * query.pageSize
+        : undefined;
+      const take = query.pageNumber ? query.pageSize : undefined;
+      const data = await this.prisma.favorite.findMany({
+        where: { userId },
+        include: {
+          movie: true,
+        },
+        skip,
+        take,
+      });
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Favourited movies fetched successfully',
+        data: data ?? [],
+      };
+    } catch (error) {
+      ServiceExceptions.handle(
+        error,
+        FavouriteService.name,
+        'findAllFavourites',
       );
     }
   }

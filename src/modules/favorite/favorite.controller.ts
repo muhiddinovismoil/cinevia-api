@@ -28,7 +28,7 @@ import {
 import { ICurrentUser } from '@type';
 
 import { CreateFavouriteDto, FindAllQueryDto } from './dto/request';
-import { FindAllResponseDto } from './dto/response';
+import { FindFavoriteDto } from './dto/response';
 import { FavouriteService } from './favorite.service';
 
 @ApiBearerAuth()
@@ -86,7 +86,7 @@ export class FavouriteController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @ApiSuccessResponse(FindAllResponseDto, true)
+  @ApiSuccessResponse(FindFavoriteDto, true)
   @ApiForbiddenResponse({
     type: ForbiddenExceptionDto,
     description: 'Forbidden',

@@ -74,7 +74,7 @@ export class AuthService {
       return {
         statusCode: HttpStatus.OK,
         message: 'OK',
-        data: { accessToken, refreshToken },
+        data: { accessToken, refreshToken, userId: user.id },
       };
     } catch (error) {
       ServiceExceptions.handle(error, AuthService.name, 'signin');

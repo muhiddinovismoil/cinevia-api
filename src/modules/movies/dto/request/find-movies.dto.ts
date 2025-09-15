@@ -3,7 +3,13 @@ import { SortEnum } from '@enums';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { MovieTypes } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class FetchMovieDto extends BaseFindDto {
   @ApiPropertyOptional()
@@ -74,4 +80,9 @@ export class FindRecommendedsDto {
   movieId?: string;
 }
 
-export class FindById extends BaseFindDto {}
+export class FindById extends BaseFindDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID('4')
+  userId: string;
+}

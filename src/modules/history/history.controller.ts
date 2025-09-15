@@ -24,7 +24,6 @@ import {
 import { ICurrentUser } from '@type';
 
 import { FindAllHistoryDto, UpsertHistoryDto } from './dto/request';
-import { FindAllResponseDto } from './dto/response';
 import { HistoryService } from './history.service';
 
 @ApiTags('History')
@@ -55,7 +54,7 @@ export class HistoryController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @ApiSuccessResponse(FindAllResponseDto, true)
+  @ApiSuccessResponse(FindAllHistoryDto, true)
   @ApiForbiddenResponse({
     type: ForbiddenExceptionDto,
     description: 'Forbidden',

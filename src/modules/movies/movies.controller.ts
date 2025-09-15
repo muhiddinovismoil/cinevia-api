@@ -1,4 +1,4 @@
-import { ApiSuccessResponse, Public, Roles } from '@decorators';
+import { ApiSuccessResponse, CurrentUser, Public, Roles } from '@decorators';
 import {
   BaseFindDto,
   ForbiddenExceptionDto,
@@ -33,6 +33,7 @@ import {
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { RoleTypes } from '@prisma/client';
+import { ICurrentUser } from '@type';
 import { Request, Response } from 'express';
 
 import {

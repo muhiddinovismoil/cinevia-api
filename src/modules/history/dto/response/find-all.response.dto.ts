@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { MovieResponseDto } from 'modules/movies/dto/response';
 
-export class FindAllResponseDto {
+export class FindAllHistoryDto {
   @ApiPropertyOptional()
   id: string;
 

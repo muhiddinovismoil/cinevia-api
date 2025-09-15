@@ -534,7 +534,7 @@ export class MovieService {
             },
           },
         },
-        favorites: true,
+        favorites: query.userId ? { where: { userId: query.userId } } : true,
         ratings: {
           orderBy: { createdAt: 'desc' },
           skip,

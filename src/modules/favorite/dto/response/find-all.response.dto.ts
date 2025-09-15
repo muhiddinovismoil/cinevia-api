@@ -5,7 +5,7 @@ export class OmittedMovieResponseDto extends OmitType(MovieResponseDto, [
   'category',
 ]) {}
 
-export class FindAllResponseDto {
+export class FindFavoriteDto {
   @ApiProperty()
   id: string;
 

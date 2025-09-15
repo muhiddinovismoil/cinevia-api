@@ -1,5 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '@prisma';
+import { WatchStatus } from '@prisma/client';
 import { ServiceExceptions } from '@utils';
 
 import { FindAllHistoryDto, UpsertHistoryDto } from './dto/request';
@@ -41,12 +42,13 @@ export class HistoryService {
 
   async findAll(userId: string, query?: FindAllHistoryDto) {
     try {
+      const status = query.status ? query.status : undefined;
       const skip = query.pageNumber
         ? (query.pageNumber - 1) * query.pageSize
         : undefined;
       const take = query.pageNumber ? query.pageSize : undefined;
       const data = await this.prisma.watchHistory.findMany({
-        where: { userId },
+        where: { userId, status: status },
         include: {
           movie: true,
         },

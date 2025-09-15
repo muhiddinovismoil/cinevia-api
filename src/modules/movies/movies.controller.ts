@@ -40,6 +40,7 @@ import {
   CreateMovieDto,
   CreateSeasonDto,
   FetchMovieDto,
+  FindById,
   FindRecommendedsDto,
   UpdateEpisodeDto,
   UpdateMovieDto,
@@ -287,8 +288,8 @@ export class MovieController {
     description: 'Internal server error',
   })
   @Get('/:id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.movieService.findOne(id);
+  findOne(@Param('id', ParseUUIDPipe) id: string, @Query() query: FindById) {
+    return this.movieService.findOne(id, query);
   }
 
   @ApiBearerAuth()

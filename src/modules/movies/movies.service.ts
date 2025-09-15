@@ -18,6 +18,7 @@ import {
   CreateMovieDto,
   CreateSeasonDto,
   FetchMovieDto,
+  FindById,
   FindRecommendedsDto,
   UpdateEpisodeDto,
   UpdateMovieDto,
@@ -358,9 +359,9 @@ export class MovieService {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, query: FindById) {
     try {
-      const data = await this.chechExists(id);
+      const data = await this.chechExists(id, query);
       return {
         statusCode: HttpStatus.OK,
         message: 'Movie data fetched successfully',
@@ -516,7 +517,11 @@ export class MovieService {
     }
   }
 
-  private async chechExists(id: string) {
+  private async chechExists(id: string, query?: FindById) {
+    const skip = query.pageNumber
+      ? (query.pageNumber - 1) * query.pageSize
+      : undefined;
+    const take = query.pageSize ? query.pageSize : undefined;
     const data = await this.prisma.movie.findFirst({
       where: { id },
       include: {
@@ -530,6 +535,11 @@ export class MovieService {
           },
         },
         favorites: true,
+        ratings: {
+          orderBy: { createdAt: 'desc' },
+          skip,
+          take,
+        },
       },
     });
 

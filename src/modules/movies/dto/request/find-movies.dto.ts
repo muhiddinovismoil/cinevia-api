@@ -73,3 +73,5 @@ export class FindRecommendedsDto {
   @IsOptional()
   movieId?: string;
 }
+
+export class FindById extends BaseFindDto {}

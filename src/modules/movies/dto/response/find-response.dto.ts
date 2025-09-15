@@ -19,6 +19,17 @@ export class GetMovieTitleIdResponseDto {
   @IsString()
   title: string;
 }
+
+export class RatingsDto {
+  id: string;
+  userId: string;
+  movieId: string;
+  rating: number;
+  review: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export class FavouriteDto {
   @ApiProperty()
   id: string;
@@ -115,6 +126,9 @@ export class MovieResponseDto {
 
   @ApiPropertyOptional()
   favorites: FavouriteDto;
+
+  @ApiPropertyOptional({ isArray: true })
+  ratings: RatingsDto[];
 }
 
 export class MainMoviesTvSeriesCartoonsResponseDto {

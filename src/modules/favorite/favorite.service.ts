@@ -47,6 +47,10 @@ export class FavouriteService {
           },
         },
       });
+      return {
+        statusCode: HttpStatus.NO_CONTENT,
+        message: 'Movie removed from favourite',
+      };
     } catch (error) {
       ServiceExceptions.handle(
         error,

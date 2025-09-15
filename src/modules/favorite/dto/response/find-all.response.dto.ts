@@ -3,7 +3,6 @@ import { MovieResponseDto } from 'modules/movies/dto/response';
 
 export class OmittedMovieResponseDto extends OmitType(MovieResponseDto, [
   'category',
-  'favorites',
 ]) {}
 
 export class FindAllResponseDto {

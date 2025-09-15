@@ -69,7 +69,11 @@ export class FavouriteService {
       const data = await this.prisma.favorite.findMany({
         where: { userId },
         include: {
-          movie: true,
+          movie: {
+            include: {
+              favorites: true,
+            },
+          },
         },
         skip,
         take,

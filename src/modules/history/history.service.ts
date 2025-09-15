@@ -1,6 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '@prisma';
-import { WatchStatus } from '@prisma/client';
 import { ServiceExceptions } from '@utils';
 
 import { FindAllHistoryDto, UpsertHistoryDto } from './dto/request';
@@ -50,7 +49,9 @@ export class HistoryService {
       const data = await this.prisma.watchHistory.findMany({
         where: { userId, status: { equals: status } },
         include: {
-          movie: true,
+          movie: {
+            include: { favorites: true },
+          },
         },
         take,
         skip,

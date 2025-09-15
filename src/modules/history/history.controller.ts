@@ -15,6 +15,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiTags,
@@ -32,6 +33,22 @@ import { HistoryService } from './history.service';
 export class HistoryController {
   constructor(private readonly historyService: HistoryService) {}
 
+  @HttpCode(HttpStatus.OK)
+  @ApiCreatedResponse({
+    description: 'History created',
+  })
+  @ApiForbiddenResponse({
+    type: ForbiddenExceptionDto,
+    description: 'Forbidden',
+  })
+  @ApiUnprocessableEntityResponse({
+    type: UnprocessableEntityExceptionDto,
+    description: 'Unprocessable entity',
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerErrorExceptionDto,
+    description: 'Internal server error',
+  })
   @Post()
   upsert(@CurrentUser() user: ICurrentUser, @Body() payload: UpsertHistoryDto) {
     return this.historyService.upsert(user.id, payload);

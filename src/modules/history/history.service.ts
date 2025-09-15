@@ -42,13 +42,13 @@ export class HistoryService {
 
   async findAll(userId: string, query?: FindAllHistoryDto) {
     try {
-      const status = query.status ? query.status : undefined;
+      const status = query.status;
       const skip = query.pageNumber
         ? (query.pageNumber - 1) * query.pageSize
         : undefined;
       const take = query.pageNumber ? query.pageSize : undefined;
       const data = await this.prisma.watchHistory.findMany({
-        where: { userId, status: status },
+        where: { userId, status: { equals: status } },
         include: {
           movie: true,
         },

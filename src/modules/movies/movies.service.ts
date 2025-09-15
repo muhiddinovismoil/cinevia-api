@@ -520,6 +520,7 @@ export class MovieService {
     const data = await this.prisma.movie.findFirst({
       where: { id },
       include: {
+        watchHistory: true,
         seasons: {
           orderBy: { title: 'asc' },
           include: {

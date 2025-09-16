@@ -26,6 +26,10 @@ export class RatingService {
           message: 'Rating created successfully',
         };
       }
+      return {
+        statusCode: HttpStatus.CONFLICT,
+        message: 'You already reviewed to this movie',
+      };
     } catch (error) {
       ServiceExceptions.handle(error, RatingService.name, 'create');
     }
@@ -60,28 +64,58 @@ export class RatingService {
         ? (query.pageNumber - 1) * query.pageSize
         : undefined;
       const take = query.pageSize ? query.pageSize : undefined;
-      const data = await this.prisma.rating.findMany({
-        where: { movieId },
-        select: {
-          id: true,
-          createdAt: true,
-          rating: true,
-          review: true,
-          user: {
-            select: { id: true, fullname: true, photo: true },
+      const [data, totalCount] = await this.prisma.$transaction([
+        this.prisma.rating.findMany({
+          where: { movieId },
+          skip,
+          take,
+          include: {
+            user: {
+              select: {
+                id: true,
+                fullname: true,
+                photo: true,
+              },
+            },
           },
-        },
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take,
-      });
+          orderBy: {
+            createdAt: 'desc',
+          },
+        }),
+        this.prisma.rating.count({
+          where: { movieId },
+        }),
+      ]);
+
       return {
         statusCode: HttpStatus.OK,
         message: 'Ratings of movie fetched successfully',
         data: data ?? [],
+        meta: {
+          totalCount,
+          pageNumber: query.pageNumber,
+          pageSize: query.pageSize,
+          hasMore: skip + data.length < totalCount,
+        },
       };
     } catch (error) {
       ServiceExceptions.handle(error, RatingService.name, 'getRatingOfMovie');
+    }
+  }
+
+  async removeRating(id: string, userId: string, movieId: string) {
+    try {
+      const isRatingExists = await this.prisma.rating.findFirst({
+        where: { id, userId, movieId },
+      });
+      if (!isRatingExists) throw new NotFoundException('Rating not found');
+      await this.prisma.rating.delete({ where: { id, userId, movieId } });
+      return {
+        statusCode: HttpStatus.NO_CONTENT,
+        message: 'Rating successfully removed',
+      };
+    } catch (error) {
+      ServiceExceptions.handle(error, RatingService.name, 'removeRating');
     }
   }
 }

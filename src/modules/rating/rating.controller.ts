@@ -7,6 +7,7 @@ import {
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -17,22 +18,27 @@ import {
   Query,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
+  ApiTags,
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { ICurrentUser } from '@type';
 
 import {
   CreateRatingDto,
+  DeleteRatingDto,
   FindRatingsDto,
   UpdateRatingDto,
 } from './dto/request';
 import { FindRatingsResponseDto } from './dto/response';
 import { RatingService } from './rating.service';
 
+@ApiTags('Rating')
+@ApiBearerAuth()
 @Controller('rating')
 export class RatingController {
   constructor(private readonly ratingService: RatingService) {}
@@ -95,9 +101,32 @@ export class RatingController {
   @Patch('/:id')
   update(
     @CurrentUser() user: ICurrentUser,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() payload: UpdateRatingDto,
   ) {
-    return this.ratingService.update(id,user.id, { ...payload });
+    return this.ratingService.update(id, user.id, { ...payload });
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({ description: 'Rating successfully removed' })
+  @ApiForbiddenResponse({
+    type: ForbiddenExceptionDto,
+    description: 'Forbidden',
+  })
+  @ApiUnprocessableEntityResponse({
+    type: UnprocessableEntityExceptionDto,
+    description: 'Unprocessable entity',
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerErrorExceptionDto,
+    description: 'Internal server error',
+  })
+  @Delete('/:id')
+  remove(
+    @CurrentUser() user: ICurrentUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() payload: DeleteRatingDto,
+  ) {
+    return this.ratingService.removeRating(id, user.id, payload.movieId);
   }
 }

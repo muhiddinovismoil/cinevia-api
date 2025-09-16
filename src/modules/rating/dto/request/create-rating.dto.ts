@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsNumber, IsString } from 'class-validator';
 
 export class CreateRatingDto {
@@ -14,3 +14,8 @@ export class CreateRatingDto {
   @IsString()
   review: string;
 }
+
+export class DeleteRatingDto extends OmitType(CreateRatingDto, [
+  'rating',
+  'review',
+]) {}

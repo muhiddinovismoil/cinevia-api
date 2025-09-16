@@ -2,7 +2,11 @@ import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@prisma';
 import { ServiceExceptions } from '@utils';
 
-import { CreateRatingDto, UpdateRatingDto } from './dto/request';
+import {
+  CreateRatingDto,
+  FindRatingsDto,
+  UpdateRatingDto,
+} from './dto/request';
 
 @Injectable()
 export class RatingService {
@@ -27,14 +31,18 @@ export class RatingService {
     }
   }
 
-  async update(userId: string, { movieId, ...payload }: UpdateRatingDto) {
+  async update(
+    id: string,
+    userId: string,
+    { movieId, ...payload }: UpdateRatingDto,
+  ) {
     try {
       const data = await this.prisma.rating.findUnique({
-        where: { userId_movieId: { userId, movieId } },
+        where: { id, userId_movieId: { userId, movieId } },
       });
       if (!data) throw new NotFoundException('Rating not found');
       await this.prisma.rating.update({
-        where: { userId_movieId: { movieId, userId } },
+        where: { id, userId_movieId: { movieId, userId } },
         data: { ...payload },
       });
       return {
@@ -43,6 +51,37 @@ export class RatingService {
       };
     } catch (error) {
       ServiceExceptions.handle(error, RatingService.name, 'update');
+    }
+  }
+
+  async getRatingOfMovie(movieId: string, query: FindRatingsDto) {
+    try {
+      const skip = query.pageNumber
+        ? (query.pageNumber - 1) * query.pageSize
+        : undefined;
+      const take = query.pageSize ? query.pageSize : undefined;
+      const data = await this.prisma.rating.findMany({
+        where: { movieId },
+        select: {
+          id: true,
+          createdAt: true,
+          rating: true,
+          review: true,
+          user: {
+            select: { id: true, fullname: true, photo: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take,
+      });
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Ratings of movie fetched successfully',
+        data: data ?? [],
+      };
+    } catch (error) {
+      ServiceExceptions.handle(error, RatingService.name, 'getRatingOfMovie');
     }
   }
 }

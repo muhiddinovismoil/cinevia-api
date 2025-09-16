@@ -31,16 +31,7 @@ export class UserService {
 
   async findOne(id: string) {
     try {
-      const user = await this.prisma.user.findFirst({
-        where: { id, deletedAt: null },
-        select: {
-          id: true,
-          fullname: true,
-          photo: true,
-          email: true,
-        },
-      });
-      if (!user) throw new NotFoundException('User not found');
+      const user = await this.findById(id);
       return user;
     } catch (error) {
       ServiceExceptions.handle(error, UserService.name, 'findOne');
@@ -57,7 +48,7 @@ export class UserService {
 
   async updateProfile(id: string, payload: UpdateProfileDto) {
     try {
-      const data = this.findOne(id);
+      await this.findById(id);
       const isValidEmail = await this.prisma.user.findFirst({
         where: { email: payload.email, NOT: { id } },
       });
@@ -83,5 +74,19 @@ export class UserService {
     } catch (error) {
       ServiceExceptions.handle(error, UserService.name, 'updateProfile');
     }
+  }
+
+  private async findById(id: string) {
+    const data = await this.prisma.user.findFirst({
+      where: { id, deletedAt: null },
+      select: {
+        id: true,
+        fullname: true,
+        photo: true,
+        email: true,
+      },
+    });
+    if (!data) throw new NotFoundException('User not found');
+    return data;
   }
 }

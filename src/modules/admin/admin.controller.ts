@@ -4,7 +4,6 @@ import {
   InternalServerErrorExceptionDto,
   UnprocessableEntityExceptionDto,
 } from '@dtos';
-import { RolesGuard } from '@guards';
 import {
   Controller,
   Delete,

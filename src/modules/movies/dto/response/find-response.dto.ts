@@ -8,7 +8,7 @@ import {
   IsUUID,
   IsUrl,
 } from 'class-validator';
-import { GetCategoryByIdResponseDto } from 'modules/categories/dto/response';
+import { GetAllCategoryResponseDto } from 'modules/categories/dto/response';
 
 export class GetMovieTitleIdResponseDto {
   @ApiProperty()
@@ -122,7 +122,7 @@ export class MovieResponseDto {
   updatedAt: Date;
 
   @ApiPropertyOptional()
-  category: GetCategoryByIdResponseDto;
+  category: GetAllCategoryResponseDto;
 
   @ApiPropertyOptional()
   favorites: FavouriteDto;
